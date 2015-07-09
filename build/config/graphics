@@ -1,0 +1,6 @@
+sample_buffer       1
+samples             4
+depth_size          16
+double_buffer       1
+
+# Notes:
