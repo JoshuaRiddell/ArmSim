@@ -1,135 +1,27 @@
-#   ArmSim                                                             #
-#   By: Joshua Riddell                                                 #
-#                                                                      #
-#  Permission is hereby granted, free of charge, to any person         #
-#  obtaining a copy of this software and associated documentation      #
-#  files (the "Software"), to deal in the Software without             #
-#  restriction, including without limitation the rights to use,        #
-#  copy, modify, merge, publish, distribute, sublicense, and/or sell   #
-#  copies of the Software, and to permit persons to whom the           #
-#  Software is furnished to do so.                                     #
-#                                                                      #
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,     #
-#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES     #
-#  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND            #
-#  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR        #
-#  ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      #
-#  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  #
-#  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.     #
-
 import os
 import ast
-import pyglet
-from pyglet_gui.gui import PopupConfirm, PopupMessage, Frame, Label
-from pyglet_gui.containers import HorizontalContainer, VerticalContainer
-from pyglet_gui.text_input import TextInput
-from pyglet_gui.manager import Manager
-from pyglet_gui.buttons import Button
-
+from PyQt4 import QtGui
 
 CONFIG_DIRECTORY = 'config'
-SEQUENCES_DIRECTORY = 'sequences'
-
-###############################################################################
-# Configuration functions
-###############################################################################
+SEQUENCES_DIRECTORY = 'Sequences'
 
 
-def load_config_file(filename):
-    """ Returns a dictionary containing the configuration elements in the file:
-    'filename' contained in the subfolder of the cwd: 'folder'.
+class FileManager(object):
+    def __init__(self, parent):
+        self.parent = parent
+        self.cd = os.path.dirname(os.path.realpath(__file__))
+        self.sequences = os.path.join(self.cd, SEQUENCES_DIRECTORY)
+        self.current_file = None
 
-    load_config_file(str, str) -> dict
-    """
-    cwd = os.getcwd()
-    os.chdir(os.path.join(cwd, CONFIG_DIRECTORY))
-    settings_file = open(filename, "rU")
-    usr_settings = {}
-    for line in settings_file:
-        line = line.strip()
-        if not line:
-            continue
-        if line.startswith("#"):
-            continue
-        split_line = [x for x in line.split(" ") if x != ""]
-        try:
-            usr_settings[split_line[0]] = int(split_line[1])
-        except ValueError:
-            usr_settings[split_line[0]] = float(split_line[1])
-
-    settings_file.close()
-    os.chdir(cwd)
-    return usr_settings
-
-
-def load_servo_poi(filename):
-    """ Returns a list of lists containing the configuration elements in the
-    file: 'filename' contained in the subfolder of the cwd: 'folder'.
-
-    load_config_file(str, str) -> dict
-    """
-    cwd = os.getcwd()
-    os.chdir(os.path.join(cwd, CONFIG_DIRECTORY))
-    settings_file = open(filename, "rU")
-    data = []
-    for line in settings_file:
-        line = line.strip()
-        if not line:
-            continue
-        if line.startswith("#"):
-            continue
-        else:
-            split_line = [int(x) for x in line.split(" ") if x != ""]
-            data.append(split_line[1:])
-    settings_file.close()
-    os.chdir(cwd)
-    return data
-
-
-class SequencerData(object):
-    def __init__(self, **kwargs):
-        self.window_kwargs = kwargs
-        self.filename = None
-
-    def write_sequence(self, sequencer_list, force_filename=False, returned_filename=None):
-        if returned_filename is not None:
-            self.filename = returned_filename
-        if force_filename or self.filename is None:
-            PopupTextInput(on_ok=lambda x: self.write_sequence(sequencer_list,
-                                                               returned_filename=x),
-                           **self.window_kwargs)
+    def open(self):
+        if not os.path.exists(self.sequences):
+            os.mkdir(self.sequences)
+        fname = QtGui.QFileDialog.getOpenFileName(self.parent,
+                                "Open sequence file", self.sequences,
+                                "Sequence Files (*.seq);;All Files (*)")
+        if not fname:
             return
-        cwd = os.getcwd()
-        directory = os.path.join(cwd, SEQUENCES_DIRECTORY)
-        try:
-            os.chdir(directory)
-        except:
-            os.mkdir(directory)
-            os.chdir(directory)
-        fd = open(self.filename, "w")
-        for element in sequencer_list:
-            fd.write("{0:<12}{1}".format(element.type, element.get_values()) + "\n")
-        fd.close()
-        os.chdir(cwd)
-
-    def read_sequence(self, returned_filename=None, cb=None):
-        if cb is not None:
-            self.cb = lambda x: cb(x)
-        if returned_filename is not None:
-            self.filename = returned_filename
-        else:
-            PopupTextInput(on_ok=self.read_sequence, **self.window_kwargs)
-            return
-        cwd = os.getcwd()
-        directory = os.path.join(cwd, SEQUENCES_DIRECTORY)
-        try:
-            os.chdir(directory)
-            fd = open(self.filename, "rU")
-        except:
-            fd.close()
-            os.chdir(cwd)
-            PopupMessage(text="File does not exist", **self.window_kwargs)
-            return
+        fd = open(fname, "rU")
 
         try:
             sequencer_list = []
@@ -145,36 +37,41 @@ class SequencerData(object):
                     raise
                 split_line[1] = ast.literal_eval("[" + split_line[1])
                 sequencer_list.append(split_line)
+            raise
         except:
             fd.close()
-            os.chdir(cwd)
-            PopupMessage(text="File has invalid contents", **self.window_kwargs)
-            return
+            QtGui.QMessageBox.warning(self.parent, "Invalid File",
+                "The file you have chosen has invalid contents.")
         fd.close()
-        os.chdir(cwd)
-        self.cb(sequencer_list)
+        self.parent.sequencer.load_data(sequencer_list)
 
+    def save(self):
+        if self.current_file is None:
+            self.save_as()
+            return
 
-class PopupTextInput(PopupConfirm):
-    def __init__(self, text="Please type a filename:", ok="Ok", cancel="Cancel",
-                 window=None, batch=None, group=None, theme=None,
-                 on_ok=None, on_cancel=None):
-        self._input = TextInput(text="untitled.seq")
+        try:
+            fd = open(self.current_file, "w")
+        except:
+            QtGui.QMessageBox.warning(self.parent, "Invalid File",
+                "File save failed, chances are you don't have write access.")
+            self.save_as()
+            return
 
-        def on_ok_click(_):
-            if on_ok is not None:
-                on_ok(self._input.get_text())
-            self.delete()
+        types = []
+        for element in self.parent.sequencer.current_sequence:
+            types.append(len(element.type))
+        format_string = "{0:<" + str(max(types) + 5) + "}{1}"
+        for element in self.parent.sequencer.current_sequence:
+            fd.write(format_string.format(element.type, element.get_values()) + "\n")
+        fd.close()
 
-        def on_cancel_click(_):
-            self.delete()
-
-        Manager.__init__(self, content=Frame(
-            VerticalContainer([
-                Label(text),
-                self._input,
-                HorizontalContainer([Button(ok, on_press=on_ok_click),
-                                     None,
-                                     Button(cancel, on_press=on_cancel_click)]
-                )])
-        ), window=window, batch=batch, group=group, theme=theme, is_movable=False)
+    def save_as(self):
+        if not os.path.exists(self.sequences):
+            os.mkdir(self.sequences)
+        self.current_file = QtGui.QFileDialog.getOpenFileName(self.parent,
+                                "Save sequence file", self.sequences,
+                                "Sequence Files (*.seq);;All Files (*)")
+        if not self.current_file.endswith(".seq"):
+            self.current_file += ".seq"
+        self.save()
