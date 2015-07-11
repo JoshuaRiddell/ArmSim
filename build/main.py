@@ -28,57 +28,10 @@ class MainWindow(QtGui.QMainWindow):
         self.show()
 
     def initMenus(self):
-        file_menu = [
-            "&File",
-            [
-                {
-                    "name": "&Open Arm File...",
-                    "shortcut": "Ctrl+Shift+O",
-                    "tip": "Open a SEQ File",
-                    "cb": self.file_manager.open_arm
-                },
-                {
-                    "name": "sep"
-                },
-                {
-                    "name": "&New Sequence...",
-                    "shortcut": "Ctrl+N",
-                    "tip": "Save As New File",
-                    "cb": self.file_manager.new_seq
-                },
-                {
-                    "name": "&Open Sequence...",
-                    "shortcut": "Ctrl+O",
-                    "tip": "Save As New File",
-                    "cb": self.file_manager.open_seq
-                },
-                {
-                    "name": "&Save Sequence",
-                    "shortcut": "Ctrl+S",
-                    "tip": "Save Current File",
-                    "cb": self.file_manager.save_seq
-                },
-                {
-                    "name": "&Save Sequence As...",
-                    "shortcut": "Ctrl+Shift+S",
-                    "tip": "Save As New File",
-                    "cb": self.file_manager.save_seq_as
-                },
-                {
-                    "name": "sep"
-                },
-                {
-                    "name": "&Exit",
-                    "shortcut": "Ctrl+Q",
-                    "tip": "Exit Application",
-                    "cb": QtGui.qApp.quit
-                }
-            ]
-        ]
-
+        menu_items = eval(file_io.load_menu_file())
         menubar = self.menuBar()
 
-        for menu in [file_menu]:
+        for menu in menu_items:
             newMenu = menubar.addMenu(menu[0])
             for action in menu[1]:
                 if action["name"] == "sep":

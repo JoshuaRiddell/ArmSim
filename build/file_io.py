@@ -3,7 +3,8 @@ import os
 import ast
 from PyQt4 import QtGui
 
-CONFIG_FILE = 'config.conf'
+MENU_FILE = join('config', 'menus.conf')
+CONFIG_FILE = join('config', 'config.conf')
 SEQUENCES_DIRECTORY = 'sequences'
 
 APP_DIR = dirname(realpath(__file__))
@@ -158,3 +159,12 @@ def load_config():
             pass
     fd.close()
     return settings
+
+def load_menu_file():
+    """ Loads menu list
+    """
+    fd = open(join(APP_DIR, MENU_FILE), 'rU')
+    menu_string = ""
+    for line in fd:
+        menu_string += line.strip()
+    return menu_string
