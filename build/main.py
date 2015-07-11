@@ -3,6 +3,8 @@ import sys
 
 from PyQt4 import QtGui, QtCore, QtOpenGL
 
+CONFIG = file_io.load_config()
+
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
@@ -11,7 +13,9 @@ class MainWindow(QtGui.QMainWindow):
         centralWidget = QtGui.QWidget()
         self.setCentralWidget(centralWidget)
 
-        self.file_manager = file_io.FileManager(self)
+        self.file_manager = file_io.FileManager(self,
+                                                CONFIG["def_arm"],
+                                                CONFIG["def_arms_directory"])
 
         self.initMenus()
 
@@ -28,22 +32,40 @@ class MainWindow(QtGui.QMainWindow):
             "&File",
             [
                 {
-                    "name": "&Open",
-                    "shortcut": "Ctrl+O",
+                    "name": "&Open Arm File...",
+                    "shortcut": "Ctrl+Shift+O",
                     "tip": "Open a SEQ File",
-                    "cb": self.file_manager.open
+                    "cb": self.file_manager.open_arm
                 },
                 {
-                    "name": "&Save",
+                    "name": "sep"
+                },
+                {
+                    "name": "&New Sequence...",
+                    "shortcut": "Ctrl+N",
+                    "tip": "Save As New File",
+                    "cb": self.file_manager.new_seq
+                },
+                {
+                    "name": "&Open Sequence...",
+                    "shortcut": "Ctrl+O",
+                    "tip": "Save As New File",
+                    "cb": self.file_manager.open_seq
+                },
+                {
+                    "name": "&Save Sequence",
                     "shortcut": "Ctrl+S",
                     "tip": "Save Current File",
-                    "cb": self.file_manager.save
+                    "cb": self.file_manager.save_seq
                 },
                 {
-                    "name": "&Save As...",
+                    "name": "&Save Sequence As...",
                     "shortcut": "Ctrl+Shift+S",
                     "tip": "Save As New File",
-                    "cb": self.file_manager.save_as
+                    "cb": self.file_manager.save_seq_as
+                },
+                {
+                    "name": "sep"
                 },
                 {
                     "name": "&Exit",
@@ -59,6 +81,9 @@ class MainWindow(QtGui.QMainWindow):
         for menu in [file_menu]:
             newMenu = menubar.addMenu(menu[0])
             for action in menu[1]:
+                if action["name"] == "sep":
+                    newMenu.addSeparator()
+                    continue
                 newAction = QtGui.QAction(action["name"], self)
                 newAction.setShortcut(action["shortcut"])
                 newAction.setStatusTip(action["tip"])

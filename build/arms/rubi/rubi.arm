@@ -1,0 +1,14 @@
+### Define vector chains
+# syntax: "joint_name" [(axis normal)] -> "connected member" [magnitude, (direction), (normal)]
+
+>>> VECTOR_CHAINS
+origin                  [(0, 0, 1)]     ->  shoulderR           [300, (1, 0, 0),    (0, 0, 1)]
+shoulderR               [(0, 0, 1)]     ->  shoulderRhorizontal [0,   (1, 0, 0),    (0, 0, 1)]
+shoulderRhorizontal     [(0, 1, 0)]     ->  shoulderRvertical   [503, (50, 500, 0), (0, 0, 1)]
+shoulderRvertical       [(-1, 1, 0)]    ->  wristR              [200, (50, 500, 0), (0, 0, 1)]
+
+
+### Define controls
+# syntax:
+
+>>> CONTROLS

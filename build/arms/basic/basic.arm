@@ -1,0 +1,12 @@
+### Define vector chains
+# syntax: "joint_name" [(axis normal)] -> "connected member" [magnitude, (direction), (normal)]
+
+>>> VECTOR_CHAINS
+origin                  [(0, 1, 0)]     ->  member1  [200, (0, 0, 1), (-1, 0, 0)]
+member1                 [(0, 1, 0)]     ->  member2  [100, (0, 0, 1), (-1, 0, 0)]
+
+
+### Define controls
+# syntax:
+
+>>> CONTROLS
