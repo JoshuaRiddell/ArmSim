@@ -1,12 +1,17 @@
 ### Define vector chains
-# syntax: "joint_name" [(axis normal)] -> "connected member" [magnitude, (direction), (normal)]
+# syntax: [member1, member2, member3, ..., membern]
+>>> BEGIN VECTOR_CHAINS
+["origin", "member1", "member2"]
+>>> END
 
->>> VECTOR_CHAINS
-origin                  [(0, 1, 0)]     ->  member1  [200, (0, 0, 1), (-1, 0, 0)]
-member1                 [(0, 1, 0)]     ->  member2  [100, (0, 0, 1), (-1, 0, 0)]
-
+### Define members
+# syntax: [length, direction, normal, axis normal]
+>>> BEGIN MEMBERS
+["member1", 200, (0, 0, 1), (-1, 0, 0), (0, 1, 0)]
+["member2", 100, (0, 0, 1), (-1, 0, 0), (0, 1, 0)]
+>>> END
 
 ### Define controls
-# syntax:
-
->>> CONTROLS
+# syntax: not yet implemented
+>>> BEGIN CONTROLS
+>>> END

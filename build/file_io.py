@@ -1,4 +1,4 @@
-from os.path import join, realpath, dirname, isfile, splitext
+from os.path import join, realpath, dirname, isfile, splitext, exists
 import os
 import ast
 from PyQt4 import QtGui
@@ -7,6 +7,8 @@ MENU_FILE = join('config', 'menus.conf')
 CONFIG_FILE = join('config', 'config.conf')
 SEQUENCES_DIRECTORY = 'sequences'
 
+ARM_MARKER = ">>> "
+
 APP_DIR = dirname(realpath(__file__))
 
 
@@ -14,6 +16,7 @@ class FileManager(object):
     def __init__(self, parent, arm_file, arms_dir):
         self.parent = parent
         self.current_sequence = None
+        self.arm_data = {}
 
         if isfile(arm_file):
             self.arm_file = arm_file
@@ -29,7 +32,7 @@ class FileManager(object):
             self.arm_file = None
 
         if self.arm_file is not None:
-            self.update_directories()
+            self._update_directories()
         else:
             self.current_dir = APP_DIR
             self.sequences_dir = None
@@ -41,10 +44,38 @@ class FileManager(object):
             "Arm Files (*.arm);;All Files (*)")
         if not self.arm_file:
             return
-        self.update_directories()
+
+        try:
+            fd = open(self.arm_file)
+            arm_dictionary = {}
+            current_field = ""
+            for line in fd:
+                line = line.strip()
+                if not line:
+                    continue
+                if line.startswith("#"):
+                    continue
+                if line.startswith(ARM_MARKER):
+                    field_list = line[len(ARM_MARKER):].split(" ")
+                    if len(field_list) == 2:
+                        current_field = field_list[1]
+                        arm_dictionary[current_field] = []
+                    else:
+                        current_field = ""
+                    continue
+                arm_dictionary[current_field].append(eval(line))
+            fd.close()
+            self.arm_data = arm_dictionary
+            self._update_directories()
+            self.parent.effector.load_arm(self.arm_data)
+        except Exception as error:
+            QtGui.QMessageBox.warning(
+                self.parent, "Invalid Arm File",
+                "The arm file you have loaded has invalid contents \n\n" +
+                "Error: \n" + str(error))
 
     def new_seq(self):
-        if self.directory_check() is None:
+        if self._directory_check() is None:
             return
 
         self.current_sequence = QtGui.QFileDialog.getSaveFileName(
@@ -58,7 +89,7 @@ class FileManager(object):
         #self.parent.sequencer.load_data([])
 
     def open_seq(self):
-        if self.directory_check() is None:
+        if self._directory_check() is None:
             return
         self.current_sequence = QtGui.QFileDialog.getOpenFileName(
             self.parent,
@@ -111,7 +142,7 @@ class FileManager(object):
         fd.close()
 
     def save_seq_as(self):
-        if not os.path.exists(self.sequences):
+        if not exists(self.sequences):
             os.mkdir(self.sequences)
         self.current_sequence = QtGui.QFileDialog.getSaveFileName(self.parent,
                                 "Save sequence file", self.sequences,
@@ -120,7 +151,10 @@ class FileManager(object):
             self.current_sequence += ".seq"
         self.save()
 
-    def directory_check(self):
+    def get_arm_data(self):
+        return self.arm_data
+
+    def _directory_check(self):
         if self.sequences_dir is None:
             QtGui.QMessageBox.warning(self.parent, "Arm File Not Loaded",
                 "You must first load an arm file before you can use this" +
@@ -128,9 +162,11 @@ class FileManager(object):
             return
         return True
 
-    def update_directories(self):
+    def _update_directories(self):
         self.current_dir = dirname(realpath(self.arm_file))
         self.sequences_dir = join(self.current_dir, SEQUENCES_DIRECTORY)
+        if not exists(self.sequences_dir):
+            os.mkdir(self.sequences_dir)
 
 
 def load_config():
