@@ -11,6 +11,7 @@ CONFIG_FILE = 'config.conf'
 
 CONFIG = eval(file_io.load_config(CONFIG_FILE))
 
+
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -22,7 +23,7 @@ class MainWindow(QtGui.QMainWindow):
         self.sim_widget = simulator.SimWidget()
 
         self.initMenus()
-        self.initControls()
+        self.initGui()
 
         self.setWindowTitle("ArmSim")
         self.show()
@@ -44,18 +45,35 @@ class MainWindow(QtGui.QMainWindow):
                 newAction.triggered.connect(action["cb"])
                 newMenu.addAction(newAction)
 
-    def initControls(self):
-        centralWidget = QtGui.QWidget()
-        grid = QtGui.QGridLayout()
-        centralWidget.setLayout(grid)
-        self.setCentralWidget(centralWidget)
+    def initGui(self):
+        controls_label = QtGui.QLabel("Controls")
+        controls_area = QtGui.QScrollArea()
+        controls_widget = QtGui.QWidget()
+        controls_layout = QtGui.QVBoxLayout()
 
-        button = QtGui.QPushButton("Hello World")
-        grid.addWidget(button, 0, 0)
-        grid.addWidget(self.sim_widget, 0, 1)
+        for i in range(10):
+            controls_layout.addWidget(QtGui.QPushButton("Hello World"))
 
-    def test(self):
-        print("ran")
+        sequencer_label = QtGui.QLabel("Sequencer")
+
+        panel_container = QtGui.QVBoxLayout()
+        panel_container.addWidget(controls_label, 0)
+        panel_container.addWidget(controls_area, 1)
+        panel_container.addWidget(sequencer_label, 0)
+
+        main_container = QtGui.QHBoxLayout()
+        main_container.addLayout(panel_container, 2)
+        main_container.addWidget(self.sim_widget, 3)
+
+        central_widget = QtGui.QWidget(self)
+        central_widget.setLayout(main_container)
+        self.setCentralWidget(central_widget)
+
+        # button_layout -> button_widget -> scroll_area -> panel_container -> main_container -> central_widget
+
+    def load_arm(self, arm_data):
+        self.effector.load_arm(self.arm_data)
+        print("Load data")
 
 
 if __name__ == '__main__':

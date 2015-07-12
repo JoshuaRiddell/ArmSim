@@ -67,7 +67,7 @@ class FileManager(object):
             fd.close()
             self.arm_data = arm_dictionary
             self._update_directories()
-            self.parent.effector.load_arm(self.arm_data)
+            self.parent.load_arm(self.arm_data)
         except Exception as error:
             QtGui.QMessageBox.warning(
                 self.parent, "Invalid Arm File",
