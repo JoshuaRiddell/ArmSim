@@ -1,10 +1,16 @@
 ### Define vector chains
-# syntax: "joint_name" [(axis normal)] -> "connected member" [magnitude, (direction), (normal)]
+# syntax: [member1, member2, member3, ..., membern]
 >>> BEGIN VECTOR_CHAINS
-origin                  [(0, 0, 1)]     ->  shoulderR           [300, (1, 0, 0),    (0, 0, 1)]
-shoulderR               [(0, 0, 1)]     ->  shoulderRhorizontal [0,   (1, 0, 0),    (0, 0, 1)]
-shoulderRhorizontal     [(0, 1, 0)]     ->  shoulderRvertical   [503, (50, 500, 0), (0, 0, 1)]
-shoulderRvertical       [(-1, 1, 0)]    ->  wristR              [200, (50, 500, 0), (0, 0, 1)]
+["origin", "shoulderR", "shoulderRhorizontal", "shoulderRvertical", "wristR"]
+>>> END
+
+### Define members
+# syntax: [length, mounting axis normal, direction, normal]
+>>> BEGIN 
+["shoulderR",            300,  [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
+["shoulderRhorizontal",  0,    [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
+["shoulderRvertical",    503,  [0, 1, 0],  [50, 500, 0], [0, 0, 1]]
+["wristR",               200,  [-1, 1, 0], [50, 500, 0], [0, 0, 1]]
 >>> END
 
 ### Define controls

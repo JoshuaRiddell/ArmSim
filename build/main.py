@@ -16,14 +16,15 @@ class MainWindow(QtGui.QMainWindow):
         self.file_manager = file_io.FileManager(self,
                                                 CONFIG["def_arm"],
                                                 CONFIG["def_arms_directory"])
-        self.effector = arm.Effector()
+        self.effector = arm.Arm()
         self.sim_widget = simulator.SimWidget()
 
         self.initMenus()
         self.initControls()
 
         self.setWindowTitle("ArmSim")
-        self.showMaximized()
+        self.show()
+        # self.showMaximized()
 
     def initMenus(self):
         menu_items = eval(file_io.load_menu_file())
