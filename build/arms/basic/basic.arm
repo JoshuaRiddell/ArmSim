@@ -14,6 +14,6 @@
 ### Define controls
 # syntax: not yet implemented
 >>> BEGIN CONTROLS
-angle [("origin", "member1"), 0]
-angle [("member1", "member2"), 0]
+# angle [("origin", "member1"), 0]
+# angle [("member1", "member2"), 0]
 >>> END

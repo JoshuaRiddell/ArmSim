@@ -3,8 +3,8 @@ import os
 import ast
 from PyQt4 import QtGui
 
-MENU_FILE = join('config', 'menus.conf')
-CONFIG_FILE = join('config', 'config.conf')
+CONFIG_DIRECTORY = 'config'
+CONFIG_EXT = '.conf'
 SEQUENCES_DIRECTORY = 'sequences'
 
 ARM_MARKER = ">>> "
@@ -169,38 +169,11 @@ class FileManager(object):
             os.mkdir(self.sequences_dir)
 
 
-def load_config():
-    """ Returns configuration dictionary.
-    """
-    filename = join(dirname(realpath(__file__)),
-                    CONFIG_FILE)
-    fd = open(filename, "rU")
-    settings = {}
-    for line in fd:
-        line = line.strip()
-        if not line:
-            continue
-        if line.startswith("#"):
-            continue
-        split_line = [x for x in line.split(" ") if x != ""]
-        try:
-            if not split_line[1].isdigit():
-                settings[split_line[0]] = split_line[1]
-                continue
-            try:
-                settings[split_line[0]] = int(split_line[1])
-            except ValueError:
-                settings[split_line[0]] = float(split_line[1])
-        except:
-            pass
-    fd.close()
-    return settings
-
-def load_menu_file():
+def load_config(filename):
     """ Loads menu list
     """
-    fd = open(join(APP_DIR, MENU_FILE), 'rU')
+    fd = open(join(APP_DIR, CONFIG_DIRECTORY, filename), 'rU')
     menu_string = ""
     for line in fd:
-        menu_string += line.strip()
+        menu_string += line
     return menu_string

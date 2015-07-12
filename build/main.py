@@ -6,8 +6,10 @@ import sys
 
 from PyQt4 import QtGui, QtCore, QtOpenGL
 
-CONFIG = file_io.load_config()
+MENU_FILE = 'menus.conf'
+CONFIG_FILE = 'config.conf'
 
+CONFIG = eval(file_io.load_config(CONFIG_FILE))
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
@@ -27,7 +29,7 @@ class MainWindow(QtGui.QMainWindow):
         # self.showMaximized()
 
     def initMenus(self):
-        menu_items = eval(file_io.load_menu_file())
+        menu_items = eval(file_io.load_config(MENU_FILE))
         menubar = self.menuBar()
 
         for menu in menu_items:
