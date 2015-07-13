@@ -1,6 +1,9 @@
+# http://doc.qt.io/qt-5/qmlfirststeps.html
+
 import file_io
 import arm
 import simulator
+from controls import Angle
 
 import sys
 
@@ -8,6 +11,7 @@ from PyQt4 import QtGui, QtCore, QtOpenGL
 
 MENU_FILE = 'menus.conf'
 CONFIG_FILE = 'config.conf'
+CONTROLS_FILE = 'controls.conf'
 
 CONFIG = eval(file_io.load_config(CONFIG_FILE))
 
@@ -19,15 +23,17 @@ class MainWindow(QtGui.QMainWindow):
         self.file_manager = file_io.FileManager(self,
                                                 CONFIG["def_arm"],
                                                 CONFIG["def_arms_directory"])
-        self.effector = arm.Arm()
+        self.arm = arm.Arm()
         self.sim_widget = simulator.SimWidget()
 
         self.initMenus()
         self.initGui()
+        self.setStyleSheet("QSplitter::handle {background-color: rgb(150,150,150)}")
 
         self.setWindowTitle("ArmSim")
-        self.show()
-        # self.showMaximized()
+        self.setGeometry(-1500, 100, 900, 600)
+        # self.show()
+        self.showMaximized()
 
     def initMenus(self):
         menu_items = eval(file_io.load_config(MENU_FILE))
@@ -46,34 +52,74 @@ class MainWindow(QtGui.QMainWindow):
                 newMenu.addAction(newAction)
 
     def initGui(self):
-        controls_label = QtGui.QLabel("Controls")
-        controls_area = QtGui.QScrollArea()
-        controls_widget = QtGui.QWidget()
+        ### Begin Controls
+        self.controls_area = QtGui.QScrollArea()
+        self.controls_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.controls_widget = QtGui.QWidget(self.controls_area)
+        controls_widget_layout = QtGui.QVBoxLayout()
+
+        angle_control = Angle(self, 1, 2, 3, 4)
+        controls_widget_layout.addWidget(angle_control)
+
+        self.controls_widget.setLayout(controls_widget_layout)
+        self.controls_area.setWidget(self.controls_widget)
+
+        controls = QtGui.QWidget()
         controls_layout = QtGui.QVBoxLayout()
+        controls_layout.addWidget(QtGui.QLabel("Controls"), 0)
+        controls_layout.addWidget(self.controls_area, 1)
+        controls.setLayout(controls_layout)
+        ### End Controls
 
-        for i in range(10):
-            controls_layout.addWidget(QtGui.QPushButton("Hello World"))
+        ### Begin Sequencer
+        sequencer_area = QtGui.QTableWidget()
+        sequencer_area.setColumnCount(3)
+        sequencer_area.setRowCount(5)
 
-        sequencer_label = QtGui.QLabel("Sequencer")
+        data = {'col1':['1','2','3'], 'col2':['4','5','6'], 'col3':['7','8','9']}
 
-        panel_container = QtGui.QVBoxLayout()
-        panel_container.addWidget(controls_label, 0)
-        panel_container.addWidget(controls_area, 1)
-        panel_container.addWidget(sequencer_label, 0)
+        headers = []
+        for i, key in enumerate(data.keys()):
+            headers.append(key)
+            for j, val in enumerate(data[key]):
+                newitem = QtGui.QTableWidgetItem(val)
+                sequencer_area.setItem(i, j, newitem)
+        print(headers)
+        sequencer_area.setHorizontalHeaderLabels(headers)
 
-        main_container = QtGui.QHBoxLayout()
-        main_container.addLayout(panel_container, 2)
-        main_container.addWidget(self.sim_widget, 3)
+        sequencer_area.resizeColumnsToContents()
+        sequencer_area.resizeRowsToContents()
 
-        central_widget = QtGui.QWidget(self)
-        central_widget.setLayout(main_container)
-        self.setCentralWidget(central_widget)
+        sequencer = QtGui.QWidget()
+        sequencer_layout = QtGui.QVBoxLayout()
+        sequencer_layout.addWidget(QtGui.QLabel("Sequencer"))
+        sequencer_layout.addWidget(sequencer_area)
+        sequencer.setLayout(sequencer_layout)
+        ### End Sequencer
 
-        # button_layout -> button_widget -> scroll_area -> panel_container -> main_container -> central_widget
+        ### Begin Left Panel Layout
+        panel_widget = QtGui.QSplitter(QtCore.Qt.Vertical)
+        panel_widget.addWidget(controls)
+        panel_widget.addWidget(sequencer)
+        ### End Left Panel Layout
+
+        ### Begin Overall Layout
+        main_container = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        main_container.addWidget(panel_widget)
+        main_container.addWidget(self.sim_widget)
+        main_container.splitterMoved.connect(self.splitter_update)
+
+        self.setCentralWidget(main_container)
+        ### End Overall Layout
+
+    def splitter_update(self, index=None, stretch=None):
+        self.controls_widget.setFixedWidth(self.controls_area.frameRect().width())
 
     def load_arm(self, arm_data):
-        self.effector.load_arm(self.arm_data)
-        print("Load data")
+        self.arm.load_arm(arm_data)
+
+    def resizeEvent(self, event=None):
+        self.splitter_update()
 
 
 if __name__ == '__main__':

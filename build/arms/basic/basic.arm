@@ -19,7 +19,7 @@
 # syntax: not yet implemented
 >>> BEGIN CONTROLS
 
-# angle [("origin", "member1"), 0]
-# angle [("member1", "member2"), 0]
+Angle(self, "origin", "member1", 0)
+Angle(self, "member1", "member2", 0)
 
 >>> END

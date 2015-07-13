@@ -32,10 +32,10 @@ class Arm(object):
         for chain in self.chains:
             pass
 
-    def set_angle(self, member):
+    def set_angle(self, joint):
         pass
 
-    def set_point(self, member):
+    def set_point(self, joint):
         pass
 
 
