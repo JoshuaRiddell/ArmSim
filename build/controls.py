@@ -39,4 +39,4 @@ class Angle(QtGui.QWidget):
         self.value = value
         for obj in self.inputs:
             obj.setValue(value)
-        self.parent.arm.set_angle(self.joint, self.value)
+        self.parent.update_arm_pos("set_angle", self.joint, self.value)

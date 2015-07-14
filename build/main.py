@@ -56,16 +56,8 @@ class MainWindow(QtGui.QMainWindow):
         ### Begin Controls
         self.controls_area = QtGui.QScrollArea()
         self.controls_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.controls_widget = QtGui.QWidget(self.controls_area)
-        controls_widget_layout = QtGui.QVBoxLayout()
 
-        if self.arm_data is not None:
-            for i, control in enumerate(self.arm_data["CONTROLS"]):
-                new_control = eval(control)
-                controls_widget_layout.addWidget(new_control)
-
-        self.controls_widget.setLayout(controls_widget_layout)
-        self.controls_area.setWidget(self.controls_widget)
+        self.update_controls()
 
         controls_ = QtGui.QWidget()
         controls_layout = QtGui.QVBoxLayout()
@@ -117,13 +109,29 @@ class MainWindow(QtGui.QMainWindow):
 
         self.resizeEvent()
 
+    def update_controls(self):
+        self.controls_widget = QtGui.QWidget(self.controls_area)
+        controls_widget_layout = QtGui.QVBoxLayout()
+
+        if self.arm_data is not None:
+            for i, control in enumerate(self.arm_data["CONTROLS"]):
+                new_control = eval(control)
+                controls_widget_layout.addWidget(new_control)
+
+        self.controls_widget.setLayout(controls_widget_layout)
+        self.controls_area.setWidget(self.controls_widget)
+        self.splitter_update()
+
     def splitter_update(self, index=None, stretch=None):
         self.controls_widget.setFixedWidth(self.controls_area.frameRect().width())
 
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
         self.arm_data = arm_data
-        self.initGui()
+        self.update_controls()
+
+    def update_arm_pos(self, arm_func, *args):
+        getattr(self.arm, arm_func)(*args)
 
     def resizeEvent(self, event=None):
         self.splitter_update()

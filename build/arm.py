@@ -25,7 +25,7 @@ class Arm(object):
             for i in range(len(chain)):
                 if chain[i] == "origin":
                     continue
-                self.joints[(chain[i], chain[i-1])] = 0
+                self.joints[(chain[i-1], chain[i])] = 0
         print(self.joints, self.members, self.chains, sep="\n")
 
     def calc_forward_kinematics(self):
@@ -33,7 +33,8 @@ class Arm(object):
             pass
 
     def set_angle(self, joint, value):
-        print(joint, value)
+        self.joints[joint] = value
+        print(self.joints)
 
     def set_point(self, joint, value):
         pass
