@@ -24,6 +24,7 @@ class MainWindow(QtGui.QMainWindow):
                                                 CONFIG["def_arm"],
                                                 CONFIG["def_arms_directory"])
         self.arm = arm.Arm()
+        self.arm_data = None
         self.sim_widget = simulator.SimWidget()
 
         self.initMenus()
@@ -58,17 +59,19 @@ class MainWindow(QtGui.QMainWindow):
         self.controls_widget = QtGui.QWidget(self.controls_area)
         controls_widget_layout = QtGui.QVBoxLayout()
 
-        angle_control = Angle(self, 1, 2, 3, 4)
-        controls_widget_layout.addWidget(angle_control)
+        if self.arm_data is not None:
+            for i, control in enumerate(self.arm_data["CONTROLS"]):
+                new_control = eval(control)
+                controls_widget_layout.addWidget(new_control)
 
         self.controls_widget.setLayout(controls_widget_layout)
         self.controls_area.setWidget(self.controls_widget)
 
-        controls = QtGui.QWidget()
+        controls_ = QtGui.QWidget()
         controls_layout = QtGui.QVBoxLayout()
         controls_layout.addWidget(QtGui.QLabel("Controls"), 0)
         controls_layout.addWidget(self.controls_area, 1)
-        controls.setLayout(controls_layout)
+        controls_.setLayout(controls_layout)
         ### End Controls
 
         ### Begin Sequencer
@@ -99,7 +102,7 @@ class MainWindow(QtGui.QMainWindow):
 
         ### Begin Left Panel Layout
         panel_widget = QtGui.QSplitter(QtCore.Qt.Vertical)
-        panel_widget.addWidget(controls)
+        panel_widget.addWidget(controls_)
         panel_widget.addWidget(sequencer)
         ### End Left Panel Layout
 
@@ -112,11 +115,15 @@ class MainWindow(QtGui.QMainWindow):
         self.setCentralWidget(main_container)
         ### End Overall Layout
 
+        self.resizeEvent()
+
     def splitter_update(self, index=None, stretch=None):
         self.controls_widget.setFixedWidth(self.controls_area.frameRect().width())
 
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
+        self.arm_data = arm_data
+        self.initGui()
 
     def resizeEvent(self, event=None):
         self.splitter_update()

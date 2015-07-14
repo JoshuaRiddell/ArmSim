@@ -63,7 +63,10 @@ class FileManager(object):
                     else:
                         current_field = ""
                     continue
-                arm_dictionary[current_field].append(eval(line))
+                try:
+                    arm_dictionary[current_field].append(eval(line))
+                except NameError:
+                    arm_dictionary[current_field].append(line)
             fd.close()
             self.arm_data = arm_dictionary
             self._update_directories()
