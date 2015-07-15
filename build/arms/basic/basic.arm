@@ -1,14 +1,14 @@
 ### Define vector chains
-# syntax: [member1, member2, member3, ..., membern]
+# syntax: [member_1, member_2, member_3, ..., member_n]
 >>> BEGIN VECTOR_CHAINS
 ["origin", "member1", "member2"]
 >>> END
 
 ### Define members
-# syntax: [length, mounting axis normal, direction, normal]
+# syntax: [name, length, mounting axis normal, direction, normal]
 >>> BEGIN MEMBERS
-["member1", 200, [0, 1, 0], [0, 0, 1], [-1, 0, 0]]
-["member2", 100, [0, 1, 0], [0, 0, 1], [-1, 0, 0]]
+["member1", 200, [0, -1, 0], [0, 0, 1], [-1, 0, 0]]
+["member2", 100, [0, -1, 0], [0, 0, 1], [-1, 0, 0]]
 >>> END
 
 ### Define controls

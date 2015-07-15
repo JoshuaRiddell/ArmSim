@@ -79,7 +79,6 @@ class MainWindow(QtGui.QMainWindow):
             for j, val in enumerate(data[key]):
                 newitem = QtGui.QTableWidgetItem(val)
                 sequencer_area.setItem(i, j, newitem)
-        print(headers)
         sequencer_area.setHorizontalHeaderLabels(headers)
 
         sequencer_area.resizeColumnsToContents()

@@ -6,7 +6,7 @@
 
 ### Define members
 # syntax: [length, mounting axis normal, direction, normal]
->>> BEGIN 
+>>> BEGIN MEMBERS
 ["shoulderR",            300,  [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
 ["shoulderRhorizontal",  0,    [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
 ["shoulderRvertical",    503,  [0, 1, 0],  [50, 500, 0], [0, 0, 1]]
@@ -16,4 +16,6 @@
 ### Define controls
 # syntax:
 >>> BEGIN CONTROLS
+Angle(self, ("shoulderRhorizontal", "shoulderRvertical"), -180, 180, 0, "ShoulderV")
+Angle(self, ("shoulderRvertical", "wristR"), -180, 180, 0, "Wrist")
 >>> END
