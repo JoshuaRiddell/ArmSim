@@ -37,6 +37,9 @@ class FileManager(object):
             self.current_dir = APP_DIR
             self.sequences_dir = None
 
+    def load_model(self, model_name):
+        print("LOAD MODEL")
+
     def open_arm(self):
         self.arm_file = QtGui.QFileDialog.getOpenFileName(
             self.parent,
