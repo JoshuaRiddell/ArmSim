@@ -126,7 +126,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
-        self.sim_widget.load_arm(arm_data)
+        self.sim_widget.load_arm(arm_data, self.file_manager)
         self.arm_data = arm_data
         self.update_controls()
 

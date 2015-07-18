@@ -6,6 +6,7 @@ from PyQt4 import QtGui
 CONFIG_DIRECTORY = 'config'
 CONFIG_EXT = '.conf'
 SEQUENCES_DIRECTORY = 'sequences'
+MODELS_DIRECTORY = 'models'
 
 ARM_MARKER = ">>> "
 
@@ -36,9 +37,6 @@ class FileManager(object):
         else:
             self.current_dir = APP_DIR
             self.sequences_dir = None
-
-    def load_model(self, model_name):
-        print("LOAD MODEL")
 
     def open_arm(self):
         self.arm_file = QtGui.QFileDialog.getOpenFileName(
@@ -160,6 +158,13 @@ class FileManager(object):
     def get_arm_data(self):
         return self.arm_data
 
+    def get_model_file(self, model_name):
+        file_path = join(self.models_dir, model_name)
+        if isfile(file_path):
+            return file_path
+        else:
+            return None
+
     def _directory_check(self):
         if self.sequences_dir is None:
             QtGui.QMessageBox.warning(self.parent, "Arm File Not Loaded",
@@ -173,6 +178,9 @@ class FileManager(object):
         self.sequences_dir = join(self.current_dir, SEQUENCES_DIRECTORY)
         if not exists(self.sequences_dir):
             os.mkdir(self.sequences_dir)
+        self.models_dir = join(self.current_dir, MODELS_DIRECTORY)
+        if not exists(self.models_dir):
+            os.mkdir(self.models_dir)
 
 
 def load_config(filename):
