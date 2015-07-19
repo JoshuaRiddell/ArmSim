@@ -1,5 +1,5 @@
 from PyQt4 import QtGui
-from numpy import array, dot
+from numpy import array, dot, around, append
 import transformations as tf
 from math import pi
 
@@ -41,7 +41,8 @@ class Arm(object):
             self.arm_chain.append(self.transform_members(
                 chain))
 
-        print(self.member_points)
+        for key in self.member_points.keys():
+            print(key, self.member_points[key])
 
     def transform_members(self, chain):
         angle = self.joint_angles[tuple(chain[:2])]
@@ -71,7 +72,7 @@ class Member(object):
         self.length = length
         self.vectors = []
         for vector in [axis_normal, direction, normal]:
-            self.vectors.append(tf.unit_vector(array(vector + [1])))
+            self.vectors.append(append(tf.unit_vector(array(vector)), [1]))
         self.backup = self.vectors[:]
 
     def get_rotation(self, angle):
@@ -88,4 +89,4 @@ class Member(object):
         self.vectors = self.backup[:]
 
     def __repr__(self):
-        return "Member object; direction:" + repr(self.vectors[1])
+        return "Member object; direction:" + repr(around(self.vectors[1], 1))

@@ -5,12 +5,12 @@
 >>> END
 
 ### Define members
-# syntax: [length, mounting axis normal, direction, normal]
+# syntax: [name, length, mounting axis normal, direction, normal]
 >>> BEGIN MEMBERS
 ["shoulderR",            300,  [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
 ["shoulderRhorizontal",  0,    [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
 ["shoulderRvertical",    503,  [0, 1, 0],  [50, 500, 0], [0, 0, 1]]
-["wristR",               200,  [-1, 1, 0], [50, 500, 0], [0, 0, 1]]
+["wristR",               200,  [-1, 1, 0], [-1, 1, 0],   [0, 0, 1]]
 >>> END
 
 ### Define controls
