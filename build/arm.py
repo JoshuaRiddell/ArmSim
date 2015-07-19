@@ -41,9 +41,6 @@ class Arm(object):
             self.arm_chain.append(self.transform_members(
                 chain))
 
-        for key in self.member_points.keys():
-            print(key, self.member_points[key])
-
     def transform_members(self, chain):
         angle = self.joint_angles[tuple(chain[:2])]
         trans = self.members[chain[1]].get_rotation(angle)
