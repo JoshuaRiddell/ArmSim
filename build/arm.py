@@ -1,5 +1,5 @@
 from PyQt4 import QtGui
-from numpy import array, dot, around, append
+from numpy import array, dot, cross, around, append
 import transformations as tf
 from math import pi
 
@@ -10,10 +10,10 @@ class Arm(object):
     """ Defines the robotic arm
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, parent, **kwargs):
         """ Initialises arm values.
         """
-        pass
+        self.parent = parent
 
     def load_arm(self, arm_dictionary):
         self.members = {}
@@ -29,7 +29,7 @@ class Arm(object):
                     continue
                 self.joint_angles[(chain[i-1], chain[i])] = 0
 
-        self.member_points = {ORIGIN_KEYWORD: array([0, 0, 0])}
+        self.member_points = {ORIGIN_KEYWORD: (array([0, 0, 0]), None)}
         self.arm_chain = None
 
     def calc_forward_kinematics(self):
@@ -38,8 +38,24 @@ class Arm(object):
         for chain in self.chains:
             for member in self.members.values():
                 member.reset()
-            self.arm_chain.append(self.transform_members(
-                chain))
+
+            origin = array([0,0,0])
+            norm_angle = 0
+            for index, member_name in enumerate(chain):
+                if index == 0:
+                    continue
+
+                angle = self.joint_angles[tuple(chain[index-1:index+1])]
+                trans = self.members[chain[index]].get_rotation(angle)
+
+                for sub_member_name in chain[index:]:
+                    self.members[sub_member_name].transform(trans)
+
+                self.member_points[chain[index]] = self.members[chain[index]].get_graphics(origin)
+
+                origin = origin + self.members[chain[index]].get_vector()
+
+        self.parent.sim_widget.update_display(self.member_points)
 
     def transform_members(self, chain):
         angle = self.joint_angles[tuple(chain[:2])]
@@ -47,9 +63,13 @@ class Arm(object):
         for vector in chain[1:]:
             self.members[vector].transform(trans)
 
-        origin = self.member_points[chain[0]]
+        origin = self.member_points[chain[0]][0]
+        self.member_points[chain[1]] = (origin, self.members[chain[1]])
         origin = origin + self.members[chain[1]].get_vector()
-        self.member_points[chain[1]] = origin
+        try:
+            self.member_points[chain[2]] = (origin, None)
+        except:
+            self.member_points["end_effector"] = (origin, None)
 
         if len(chain) == 2:
             return
@@ -74,6 +94,22 @@ class Member(object):
 
     def get_rotation(self, angle):
         return tf.rotation_matrix(angle*pi/180, self.vectors[0][:3])
+
+    def get_graphics(self, origin):
+        vertical = array([0, 0, 1])
+        dir_angle = 180/pi*tf.angle_between_vectors(vertical, self.vectors[1][:3])
+        dnx, dny, dnz = tf.unit_vector(cross(vertical, self.vectors[1][:3]))
+
+        temp_norm = dot(
+            self.backup[2],
+            tf.rotation_matrix(-dir_angle*pi/180, array([dnx, dny, dnz])))
+        norm_angle = 180/pi*tf.angle_between_vectors(self.vectors[2][:3], temp_norm[:3])
+
+        if round(tf.unit_vector(cross(temp_norm[:3], self.vectors[2][:3]))[0], 2) \
+        != round(self.vectors[1][0], 2):
+            norm_angle = -norm_angle
+
+        return (origin, (dir_angle, dnx, dny, dnz), (norm_angle, 0, 0, 1))
 
     def get_vector(self):
         return dot(self.length, self.vectors[1][:3])

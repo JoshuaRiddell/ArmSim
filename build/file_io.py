@@ -46,37 +46,37 @@ class FileManager(object):
         if not self.arm_file:
             return
 
-        try:
-            fd = open(self.arm_file)
-            arm_dictionary = {}
-            current_field = ""
-            for line in fd:
-                line = line.strip()
-                if not line:
-                    continue
-                if line.startswith("#"):
-                    continue
-                if line.startswith(ARM_MARKER):
-                    field_list = line[len(ARM_MARKER):].split(" ")
-                    if len(field_list) == 2:
-                        current_field = field_list[1]
-                        arm_dictionary[current_field] = []
-                    else:
-                        current_field = ""
-                    continue
-                try:
-                    arm_dictionary[current_field].append(eval(line))
-                except NameError:
-                    arm_dictionary[current_field].append(line)
-            fd.close()
-            self.arm_data = arm_dictionary
-            self._update_directories()
-            self.parent.load_arm(self.arm_data)
-        except Exception as error:
-            QtGui.QMessageBox.warning(
-                self.parent, "Invalid Arm File",
-                "The arm file you have loaded has invalid contents \n\n" +
-                "Error: \n" + str(error))
+        # try:
+        fd = open(self.arm_file)
+        arm_dictionary = {}
+        current_field = ""
+        for line in fd:
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith("#"):
+                continue
+            if line.startswith(ARM_MARKER):
+                field_list = line[len(ARM_MARKER):].split(" ")
+                if len(field_list) == 2:
+                    current_field = field_list[1]
+                    arm_dictionary[current_field] = []
+                else:
+                    current_field = ""
+                continue
+            try:
+                arm_dictionary[current_field].append(eval(line))
+            except NameError:
+                arm_dictionary[current_field].append(line)
+        fd.close()
+        self.arm_data = arm_dictionary
+        self._update_directories()
+        self.parent.load_arm(self.arm_data)
+        # except Exception as error:
+        #     QtGui.QMessageBox.warning(
+        #         self.parent, "Invalid Arm File",
+        #         "The arm file you have loaded has invalid contents \n\n" +
+        #         "Error: \n" + str(error))
 
     def new_seq(self):
         if self._directory_check() is None:

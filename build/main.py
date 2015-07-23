@@ -1,5 +1,3 @@
-# http://doc.qt.io/qt-5/qmlfirststeps.html
-
 import file_io
 import arm
 import simulator
@@ -11,7 +9,6 @@ from PyQt4 import QtGui, QtCore, QtOpenGL
 
 MENU_FILE = 'menus.conf'
 CONFIG_FILE = 'config.conf'
-CONTROLS_FILE = 'controls.conf'
 
 CONFIG = eval(file_io.load_config(CONFIG_FILE))
 
@@ -23,9 +20,9 @@ class MainWindow(QtGui.QMainWindow):
         self.file_manager = file_io.FileManager(self,
                                                 CONFIG["def_arm"],
                                                 CONFIG["def_arms_directory"])
-        self.arm = arm.Arm()
+        self.arm = arm.Arm(self)
         self.arm_data = None
-        self.sim_widget = simulator.SimWidget()
+        self.sim_widget = simulator.SimWidget(CONFIG["cam_config"])
 
         self.initMenus()
         self.initGui()

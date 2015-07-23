@@ -7,15 +7,25 @@
 ### Define members
 # syntax: [name, length, mounting axis normal, direction, normal]
 >>> BEGIN MEMBERS
-["shoulderR",            300,  [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
-["shoulderRhorizontal",  0,    [0, 0, 1],  [1, 0, 0],    [0, 0, 1]]
-["shoulderRvertical",    503,  [0, 1, 0],  [50, 500, 0], [0, 0, 1]]
-["wristR",               200,  [-1, 1, 0], [-1, 1, 0],   [0, 0, 1]]
+["shoulderR",            300,  [0, 0, 1],  [1, 0, 0],    [0, -1, 0]]
+["shoulderRhorizontal",  0,    [0, 0, 1],  [1, 0, 0],    [0, -1, 0]]
+["shoulderRvertical",    500,  [1, 0, 0],  [50, 500, 0], [0, -1, 0]]
+["wristR",               200,  [-1, 1, 0], [-1, 1, 0],   [0, -1, 0]]
 >>> END
 
 ### Define controls
 # syntax:
 >>> BEGIN CONTROLS
-Angle(self, ("shoulderRhorizontal", "shoulderRvertical"), -180, 180, 0, "ShoulderV")
-Angle(self, ("shoulderRvertical", "wristR"), -180, 180, 0, "Wrist")
+Angle(self, ("origin", "shoulderR"), -180, 180, 0, "Right Shoulder")
+Angle(self, ("shoulderR", "shoulderRhorizontal"), -180, 180, 0, "Right Shoulder Horizontal")
+Angle(self, ("shoulderRhorizontal", "shoulderRvertical"), -180, 180, 0, "Right Shoulder Vertical")
+Angle(self, ("shoulderRvertical", "wristR"), -180, 180, 0, "Right Wrist")
+>>> END
+
+### Define models
+>>> BEGIN MODELS
+["shoulderR", "member1.stl"]
+["shoulderRhorizontal", "member1.stl"]
+["shoulderRvertical", "member1.stl"]
+["wristR", "member1.stl"]
 >>> END

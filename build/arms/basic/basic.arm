@@ -7,8 +7,8 @@
 ### Define members
 # syntax: [name, length, mounting axis normal, direction, normal]
 >>> BEGIN MEMBERS
-["member1", 200, [0, -1, 0], [0, 0, 1], [-1, 0, 0]]
-["member2", 100, [0, -1, 0], [0, 0, 1], [-1, 0, 0]]
+["member1", 200, [0, -1, 0], [0, 0, 1], [0, -1, 0]]
+["member2", 100, [-1, 0, 0], [0, 0, 1], [0, -1, 0]]
 >>> END
 
 ### Define controls
@@ -20,6 +20,6 @@ Angle(self, ("member1", "member2"), -180, 180, 0, "Joint1")
 
 ### Define models
 >>> BEGIN MODELS
-["member1.stl", "member1"]
-["member2.stl", "member2"]
+["member1", "member1.stl"]
+["member2", "member2.stl"]
 >>> END
