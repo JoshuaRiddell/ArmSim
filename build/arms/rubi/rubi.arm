@@ -22,12 +22,11 @@
 ### Define controls
 # syntax:
 >>> BEGIN CONTROLS
-Angle(self, ("origin", "shoulderR"), -180, 180, 0, "Right Shoulder")
+Angle(self, [("origin", "shoulderR", "x"), ("origin", "shoulderL", "-x")], -180, 180, 0, "Shoulder")
 Angle(self, ("shoulderR", "shoulderRhorizontal"), -180, 180, 0, "Right Shoulder Horizontal")
 Angle(self, ("shoulderRhorizontal", "shoulderRvertical"), -180, 180, 0, "Right Shoulder Vertical")
 Angle(self, ("shoulderRvertical", "wristR"), -180, 180, 0, "Right Wrist")
 
-Angle(self, ("origin", "shoulderL"), -180, 180, 0, "Left Shoulder")
 Angle(self, ("shoulderL", "shoulderLhorizontal"), -180, 180, 0, "Left Shoulder Horizontal")
 Angle(self, ("shoulderLhorizontal", "shoulderLvertical"), -180, 180, 0, "Left Shoulder Vertical")
 Angle(self, ("shoulderLvertical", "wristL"), -180, 180, 0, "Left Wrist")

@@ -18,7 +18,6 @@ class Angle(QtGui.QWidget):
 
     def initGui(self):
         layout = QtGui.QVBoxLayout()
-
         control_layout = QtGui.QHBoxLayout()
 
         self.inputs = [QtGui.QSpinBox(), QtGui.QSlider(QtCore.Qt.Horizontal)]
@@ -40,4 +39,9 @@ class Angle(QtGui.QWidget):
         self.value = value
         for obj in self.inputs:
             obj.setValue(value)
-        self.parent.update_arm_pos("set_angle", self.joint, self.value)
+        if self.multiple:
+            x = self.value
+            for joint in self.joints:
+                self.parent.update_arm_pos("set_angle", joint[:2], eval(joint[2]))
+        else:
+            self.parent.update_arm_pos("set_angle", self.joints, self.value)
