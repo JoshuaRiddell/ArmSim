@@ -2,14 +2,15 @@ from PyQt4 import QtGui, QtCore
 
 
 class Angle(QtGui.QWidget):
-    def __init__(self, parent, joint, minimum, maximum, default, name=None):
+    def __init__(self, parent, joints, minimum, maximum, default, name=None):
         super().__init__()
 
         self.parent = parent
         self.value = default
         self.minimum = minimum
         self.maximum = maximum
-        self.joint = joint
+        self.joints = joints
+        self.multiple = type(self.joints) == type([])
         self.name = name
 
         self.initGui()
@@ -31,7 +32,7 @@ class Angle(QtGui.QWidget):
         if self.name is not None:
             layout.addWidget(QtGui.QLabel("Angle: " + str(self.name)))
         else:
-            layout.addWidget(QtGui.QLabel("Angle: " + str(self.joint)))
+            layout.addWidget(QtGui.QLabel("Angle: " + str(self.joints)))
         layout.addLayout(control_layout)
         self.setLayout(layout)
 
