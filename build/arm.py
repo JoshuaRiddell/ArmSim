@@ -113,7 +113,6 @@ class Member(object):
         self.axis_normal = dot(self.axis_normal, matrix)
 
     def reset(self):
-        print(self.backup)
         self.axis_normal = self.backup[0][:]
         self.axes = self.backup[1][:]
 

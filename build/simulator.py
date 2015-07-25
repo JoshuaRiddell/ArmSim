@@ -37,7 +37,6 @@ class SimWidget(QtOpenGL.QGLWidget):
             glLoadIdentity()
             gluLookAt(*self.camera.get_cam())
             graphics_part.draw()
-            print(glGetFloatv(GL_MODELVIEW_MATRIX))
 
     def resizeGL(self, width, height):
         glMatrixMode(GL_PROJECTION)
