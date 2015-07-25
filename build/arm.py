@@ -51,7 +51,7 @@ class Arm(object):
                 for sub_member_name in chain[index:]:
                     self.members[sub_member_name].transform(trans)
 
-                self.member_points[chain[index]] = self.members[chain[index]].get_graphics(origin)
+                self.member_points[chain[index]] = self.members[chain[index]].get_graphics_matrix(*origin)
 
                 origin = origin + self.members[chain[index]].get_vector()
 
@@ -85,41 +85,37 @@ class Arm(object):
 
 
 class Member(object):
-    def __init__(self, length, axis_normal, direction, normal):
+    def __init__(self, length, axis_normal, x, y, z):
         self.length = length
-        self.vectors = []
-        for vector in [axis_normal, direction, normal]:
-            self.vectors.append(append(tf.unit_vector(array(vector)), [1]))
-        self.backup = self.vectors[:]
+        self.axes = []
+        for vector in [x, y, z]:
+            self.axes.append(append(tf.unit_vector(array(vector)), [1]))
+        self.axis_normal = append(tf.unit_vector(array(axis_normal)), [1])
+
+        self.backup = [self.axis_normal, self.axes]
 
     def get_rotation(self, angle):
-        return tf.rotation_matrix(angle*pi/180, self.vectors[0][:3])
+        return tf.rotation_matrix(angle*pi/180, self.axis_normal[:3])
 
-    def get_graphics(self, origin):
-        vertical = array([0, 0, 1])
-        dir_angle = 180/pi*tf.angle_between_vectors(vertical, self.vectors[1][:3])
-        dnx, dny, dnz = tf.unit_vector(cross(vertical, self.vectors[1][:3]))
-
-        temp_norm = dot(
-            self.backup[2],
-            tf.rotation_matrix(-dir_angle*pi/180, array([dnx, dny, dnz])))
-        norm_angle = 180/pi*tf.angle_between_vectors(self.vectors[2][:3], temp_norm[:3])
-
-        if round(tf.unit_vector(cross(temp_norm[:3], self.vectors[2][:3]))[0], 2) \
-        != round(self.vectors[1][0], 2):
-            norm_angle = -norm_angle
-
-        return (origin, (dir_angle, dnx, dny, dnz), (norm_angle, 0, 0, 1))
+    def get_graphics_matrix(self, transx, transy, transz):
+        translation_matrix = []
+        for axis_vector in self.axes:
+            translation_matrix.append(list(axis_vector)[:3] + [0])
+        translation_matrix.append([transx, transy, transz, 1])
+        return translation_matrix
 
     def get_vector(self):
-        return dot(self.length, self.vectors[1][:3])
+        return dot(self.length, self.axes[2][:3])
 
     def transform(self, matrix):
-        for i, vector in enumerate(self.vectors):
-            self.vectors[i] = dot(vector, matrix)
+        for i, axis_vector in enumerate(self.axes):
+            self.axes[i] = dot(axis_vector, matrix)
+        self.axis_normal = dot(self.axis_normal, matrix)
 
     def reset(self):
-        self.vectors = self.backup[:]
+        print(self.backup)
+        self.axis_normal = self.backup[0][:]
+        self.axes = self.backup[1][:]
 
     def __repr__(self):
         return "Member object; direction:" + repr(around(self.vectors[1], 1))

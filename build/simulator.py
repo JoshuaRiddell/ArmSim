@@ -8,6 +8,10 @@ from PyQt4 import QtCore, QtGui, QtOpenGL
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+gl_identity = [[1, 0, 0, 0],
+               [0, 1, 0, 0],
+               [0, 0, 1, 0],
+               [0, 0, 0, 1]]
 
 class SimWidget(QtOpenGL.QGLWidget):
     def __init__(self, cam_config):
@@ -33,6 +37,7 @@ class SimWidget(QtOpenGL.QGLWidget):
             glLoadIdentity()
             gluLookAt(*self.camera.get_cam())
             graphics_part.draw()
+            print(glGetFloatv(GL_MODELVIEW_MATRIX))
 
     def resizeGL(self, width, height):
         glMatrixMode(GL_PROJECTION)
@@ -45,10 +50,10 @@ class SimWidget(QtOpenGL.QGLWidget):
 
     def update_display(self, arm_vectors):
         for graphics_part in self.graphics_parts:
-            vector = arm_vectors.get(graphics_part.name)
-            if vector is None:
+            matrix = arm_vectors.get(graphics_part.name)
+            if matrix is None:
                 continue
-            graphics_part.set_transformation(*vector)
+            graphics_part.set_transformation(matrix)
         self.updateGL()
 
     def mousePressEvent(self, event):
@@ -71,7 +76,6 @@ class SimWidget(QtOpenGL.QGLWidget):
         self.updateGL()
 
     def wheelEvent(self, event):
-        print(event.delta())
         self.camera.user_zoom(event.delta())
 
     def load_arm(self, arm_data, file_manager):
@@ -89,21 +93,18 @@ class GraphicsPart(object):
 
     def __init__(self, name, file_object):
         self.name = name
-        self.translation = array([0,0,0])
+        self.transformation = gl_identity
+
         self.gl_list = glGenLists(1)
         glNewList(self.gl_list, GL_COMPILE)
         self.load_ascii_stl(file_object)
         glEndList()
 
-    def set_transformation(self, trans, dir_angle, norm_angle):
-        self.norm_angle = norm_angle
-        self.dir_angle = dir_angle
-        self.translation = trans
+    def set_transformation(self, transformation_matrix):
+        self.transformation = transformation_matrix
 
     def draw(self):
-        glTranslatef(*self.translation)
-        glRotatef(*self.dir_angle)
-        glRotatef(*self.norm_angle)
+        glMultMatrixf(self.transformation)
         glCallList(self.gl_list)
 
     def load_ascii_stl(self, file_object):

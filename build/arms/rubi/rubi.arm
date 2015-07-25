@@ -5,12 +5,12 @@
 >>> END
 
 ### Define members
-# syntax: [name, length, mounting axis normal, direction, normal]
+# syntax: [name, length, mounting axis normal, x, y, z]
 >>> BEGIN MEMBERS
-["shoulderR",            300,  [0, 0, 1],  [1, 0, 0],    [0, -1, 0]]
-["shoulderRhorizontal",  0,    [0, 0, 1],  [1, 0, 0],    [0, -1, 0]]
-["shoulderRvertical",    500,  [1, 0, 0],  [50, 500, 0], [0, -1, 0]]
-["wristR",               200,  [-1, 1, 0], [-1, 1, 0],   [0, -1, 0]]
+["shoulderR",            300,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],     [1, 0, 0]]
+["shoulderRhorizontal",  0,    [0, 0, 1],  [0, 0, -1], [0, 1, 0],     [1, 0, 0]]
+["shoulderRvertical",    500,  [1, 0, 0],  [0, 0, -1], [-500, 50, 0], [50, 500, 0]]
+["wristR",               200,  [-1, 1, 0], [0, 0, -1], [-1, -1, 0],   [-1, 1, 0]]
 >>> END
 
 ### Define controls
@@ -25,7 +25,6 @@ Angle(self, ("shoulderRvertical", "wristR"), -180, 180, 0, "Right Wrist")
 ### Define models
 >>> BEGIN MODELS
 ["shoulderR", "member1.stl"]
-["shoulderRhorizontal", "member1.stl"]
 ["shoulderRvertical", "member1.stl"]
 ["wristR", "member1.stl"]
 >>> END
