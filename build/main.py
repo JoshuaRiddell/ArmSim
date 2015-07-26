@@ -1,6 +1,7 @@
 import file_io
 import arm
 import simulator
+import sequencer
 from controls import Angle
 
 import sys
@@ -23,6 +24,7 @@ class MainWindow(QtGui.QMainWindow):
         self.arm = arm.Arm(self)
         self.arm_data = None
         self.sim_widget = simulator.SimWidget(CONFIG["cam_config"])
+        self.sequencer_widget = sequencer.SequencerWidget()
 
         self.initMenus()
         self.initGui()
@@ -64,27 +66,10 @@ class MainWindow(QtGui.QMainWindow):
         ### End Controls
 
         ### Begin Sequencer
-        sequencer_area = QtGui.QTableWidget()
-        sequencer_area.setColumnCount(3)
-        sequencer_area.setRowCount(5)
-
-        data = {'col1':['1','2','3'], 'col2':['4','5','6'], 'col3':['7','8','9']}
-
-        headers = []
-        for i, key in enumerate(data.keys()):
-            headers.append(key)
-            for j, val in enumerate(data[key]):
-                newitem = QtGui.QTableWidgetItem(val)
-                sequencer_area.setItem(i, j, newitem)
-        sequencer_area.setHorizontalHeaderLabels(headers)
-
-        sequencer_area.resizeColumnsToContents()
-        sequencer_area.resizeRowsToContents()
-
         sequencer = QtGui.QWidget()
         sequencer_layout = QtGui.QVBoxLayout()
-        sequencer_layout.addWidget(QtGui.QLabel("Sequencer"))
-        sequencer_layout.addWidget(sequencer_area)
+        sequencer_layout.addWidget(QtGui.QLabel("Sequencer"), 0)
+        sequencer_layout.addWidget(self.sequencer_widget, 0)
         sequencer.setLayout(sequencer_layout)
         ### End Sequencer
 
@@ -111,8 +96,7 @@ class MainWindow(QtGui.QMainWindow):
 
         if self.arm_data is not None:
             for i, control in enumerate(self.arm_data["CONTROLS"]):
-                new_control = eval(control)
-                controls_widget_layout.addWidget(new_control)
+                controls_widget_layout.addWidget(eval(control))
 
         self.controls_widget.setLayout(controls_widget_layout)
         self.controls_area.setWidget(self.controls_widget)

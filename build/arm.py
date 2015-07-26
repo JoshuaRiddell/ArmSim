@@ -46,7 +46,7 @@ class Arm(object):
                     continue
 
                 angle = self.joint_angles[tuple(chain[index-1:index+1])]
-                trans = self.members[chain[index]].get_rotation(angle)
+                trans = self.members[chain[index]].get_rotation_matrix(angle)
 
                 for sub_member_name in chain[index:]:
                     self.members[sub_member_name].transform(trans)
@@ -59,7 +59,7 @@ class Arm(object):
 
     def transform_members(self, chain):
         angle = self.joint_angles[tuple(chain[:2])]
-        trans = self.members[chain[1]].get_rotation(angle)
+        trans = self.members[chain[1]].get_rotation_matrix(angle)
         for vector in chain[1:]:
             self.members[vector].transform(trans)
 
@@ -94,7 +94,7 @@ class Member(object):
 
         self.backup = [self.axis_normal, self.axes]
 
-    def get_rotation(self, angle):
+    def get_rotation_matrix(self, angle):
         return tf.rotation_matrix(angle*pi/180, self.axis_normal[:3])
 
     def get_graphics_matrix(self, transx, transy, transz):
