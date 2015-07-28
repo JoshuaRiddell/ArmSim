@@ -82,6 +82,9 @@ class Arm(object):
 
     def set_point(self, joint, value):
         pass
+    
+    def get_joints(self):
+        
 
 
 class Member(object):

@@ -52,6 +52,11 @@ class MainWindow(QtGui.QMainWindow):
                 newMenu.addAction(newAction)
 
     def initGui(self):
+        ### Begin Quick Buttons
+        quick_buttons = QtGui.QWidget()
+        quick_buttons_layout = QtGui.QHBoxLayout()
+        ### Begin Quick Buttons
+
         ### Begin Controls
         self.controls_area = QtGui.QScrollArea()
         self.controls_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -102,9 +107,6 @@ class MainWindow(QtGui.QMainWindow):
         self.controls_area.setWidget(self.controls_widget)
         self.splitter_update()
 
-    def splitter_update(self, index=None, stretch=None):
-        self.controls_widget.setFixedWidth(self.controls_area.frameRect().width())
-
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
         self.sim_widget.load_arm(arm_data, self.file_manager)
@@ -113,6 +115,9 @@ class MainWindow(QtGui.QMainWindow):
 
     def update_arm_pos(self, arm_func, *args):
         getattr(self.arm, arm_func)(*args)
+
+    def splitter_update(self, index=None, stretch=None):
+        self.controls_widget.setFixedWidth(self.controls_area.frameRect().width())
 
     def resizeEvent(self, event=None):
         self.splitter_update()
