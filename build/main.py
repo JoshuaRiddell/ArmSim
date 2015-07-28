@@ -24,7 +24,7 @@ class MainWindow(QtGui.QMainWindow):
         self.arm = arm.Arm(self)
         self.arm_data = None
         self.sim_widget = simulator.SimWidget(CONFIG["cam_config"])
-        self.sequencer_widget = sequencer.SequencerWidget()
+        self.sequencer_widget = sequencer.SequencerWidget(self)
 
         self.initMenus()
         self.initGui()
@@ -107,11 +107,15 @@ class MainWindow(QtGui.QMainWindow):
         self.controls_area.setWidget(self.controls_widget)
         self.splitter_update()
 
+    def update_control_values(self):
+        pass
+
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
         self.sim_widget.load_arm(arm_data, self.file_manager)
         self.arm_data = arm_data
         self.update_controls()
+        self.sequencer_widget.hard_update()
 
     def update_arm_pos(self, arm_func, *args):
         getattr(self.arm, arm_func)(*args)

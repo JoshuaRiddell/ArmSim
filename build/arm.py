@@ -14,6 +14,7 @@ class Arm(object):
         """ Initialises arm values.
         """
         self.parent = parent
+        self.joint_angles = {}
 
     def load_arm(self, arm_dictionary):
         self.members = {}
@@ -39,8 +40,7 @@ class Arm(object):
             for member in self.members.values():
                 member.reset()
 
-            origin = array([0,0,0])
-            norm_angle = 0
+            origin = self.member_points[ORIGIN_KEYWORD][0]
             for index, member_name in enumerate(chain):
                 if index == 0:
                     continue
@@ -56,6 +56,8 @@ class Arm(object):
                 origin = origin + self.members[chain[index]].get_vector()
 
         self.parent.sim_widget.update_display(self.member_points)
+        print(self.joint_angles)
+        # print(self.parent.sequencer_widget.sequence[0].joint_angles)
 
     def transform_members(self, chain):
         angle = self.joint_angles[tuple(chain[:2])]
@@ -82,9 +84,15 @@ class Arm(object):
 
     def set_point(self, joint, value):
         pass
-    
+
     def get_joints(self):
-        
+        pass
+
+    def get_joint_names(self):
+        joint_name_list = []
+        for key in self.joint_angles.keys():
+            joint_name_list.append(str(key))
+        return joint_name_list
 
 
 class Member(object):
