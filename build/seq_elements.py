@@ -49,7 +49,7 @@ class NodeElement(_SequenceElement):
         self.joint_angles = arm.joint_angles.copy()
 
     def get_values(self, arm):
-        arm.joint_angles = self.joint_angles.copy()
+        arm.set_joint_angles(self.joint_angles.copy())
 
     def hard_update(self, arm):
         self.headers = ["QPos"]

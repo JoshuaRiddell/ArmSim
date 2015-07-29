@@ -5,7 +5,7 @@ class Angle(QtGui.QWidget):
     def __init__(self, parent, joints, minimum, maximum, default, name=None):
         super().__init__()
 
-        self.parent = parent
+        self.arm = parent.arm
         self.value = default
         self.minimum = minimum
         self.maximum = maximum
@@ -42,6 +42,18 @@ class Angle(QtGui.QWidget):
         if self.multiple:
             x = self.value
             for joint in self.joints:
-                self.parent.update_arm_pos("set_angle", joint[:2], eval(joint[2]))
+                self.arm.set_angle(joint[:2], eval(joint[2]))
         else:
-            self.parent.update_arm_pos("set_angle", self.joints, self.value)
+            self.arm.set_angle(self.joints, self.value)
+
+    def pull_values(self):
+        joint_angles = self.arm.joint_angles
+        if self.multiple:
+            joint = self.joints[0]
+        else:
+            joint = self.joints
+
+        self.value = joint_angles[joint]
+        print(self.value)
+        for obj in self.inputs:
+            obj.setValue(self.value)

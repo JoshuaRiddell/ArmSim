@@ -56,7 +56,6 @@ class Arm(object):
                 origin = origin + self.members[chain[index]].get_vector()
 
         self.parent.sim_widget.update_display(self.member_points)
-        print(self.joint_angles)
         # print(self.parent.sequencer_widget.sequence[0].joint_angles)
 
     def transform_members(self, chain):
@@ -85,8 +84,9 @@ class Arm(object):
     def set_point(self, joint, value):
         pass
 
-    def get_joints(self):
-        pass
+    def set_joint_angles(self, joint_angles):
+        self.joint_angles = joint_angles
+        self.parent.update_control_values()
 
     def get_joint_names(self):
         joint_name_list = []

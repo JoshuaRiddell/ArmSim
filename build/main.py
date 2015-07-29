@@ -96,19 +96,23 @@ class MainWindow(QtGui.QMainWindow):
         self.resizeEvent()
 
     def update_controls(self):
+        self.controls = []
         self.controls_widget = QtGui.QWidget(self.controls_area)
         controls_widget_layout = QtGui.QVBoxLayout()
 
         if self.arm_data is not None:
             for i, control in enumerate(self.arm_data["CONTROLS"]):
+                new_control = eval(control)
                 controls_widget_layout.addWidget(eval(control))
+                self.controls.append(new_control)
 
         self.controls_widget.setLayout(controls_widget_layout)
         self.controls_area.setWidget(self.controls_widget)
         self.splitter_update()
 
     def update_control_values(self):
-        pass
+        for control in self.controls:
+            control.pull_values()
 
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
