@@ -20,7 +20,10 @@ class _SequenceElement(object):
         raise(NotImplementedError)
 
     def get_table_value(self, header):
-        raise(NotImplementedError)
+        if header == "QPos":
+            return self.queue_pos
+        if header == "Name":
+            return self.name
 
     def set_values(self, arm):
         raise(NotImplementedError)
@@ -40,7 +43,10 @@ class NodeElement(_SequenceElement):
         self.joint_angles = {}
 
     def get_table_value(self, header):
-        pass
+        super().get_table_value(header)
+        for key in self.joint_angles.keys():
+            if str(key) == header:
+                return self.joint_angles[key]
 
     def tie_values(self, arm):
         self.joint_angles = arm.joint_angles

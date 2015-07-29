@@ -49,11 +49,14 @@ class Angle(QtGui.QWidget):
     def pull_values(self):
         joint_angles = self.arm.joint_angles
         if self.multiple:
-            joint = self.joints[0]
+            joint = self.joints[0][:2]
         else:
             joint = self.joints
 
         self.value = joint_angles[joint]
-        print(self.value)
         for obj in self.inputs:
             obj.setValue(self.value)
+            obj.update()
+            obj.repaint()
+        self.update()
+        self.repaint()

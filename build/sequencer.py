@@ -13,7 +13,15 @@ class SequencerWidget(QtGui.QTableWidget):
         self.sequence = [
             sqe.NodeElement(1, self.parent.arm),
             sqe.NodeElement(2, self.parent.arm),
-            sqe.NodeElement(3, self.parent.arm)
+            sqe.NodeElement(3, self.parent.arm),
+            sqe.NodeElement(4, self.parent.arm),
+            sqe.NodeElement(5, self.parent.arm),
+            sqe.NodeElement(6, self.parent.arm),
+            sqe.NodeElement(7, self.parent.arm),
+            sqe.NodeElement(8, self.parent.arm),
+            sqe.NodeElement(9, self.parent.arm),
+            sqe.NodeElement(10, self.parent.arm),
+            sqe.NodeElement(11, self.parent.arm)
         ]
 
         self.update_values()
@@ -33,16 +41,12 @@ class SequencerWidget(QtGui.QTableWidget):
 
         self.setRowCount(len(self.sequence))
 
-        data = {'col1':['1','2','3'], 'col2':['4','5','6'], 'col3':['7','8','9']}
-
-        headers = []
-        for i, key in enumerate(data.keys()):
-            headers.append(key)
-            for j, val in enumerate(data[key]):
-                newitem = QtGui.QTableWidgetItem(val)
+        for i, element in enumerate(self.sequence):
+            for j, header in enumerate(header_names):
+                print(i, j, element.get_table_value(header))
+                newitem = QtGui.QTableWidgetItem(element.get_table_value(header))
                 self.setItem(i, j, newitem)
 
-        self.resizeColumnsToContents()
         self.resizeRowsToContents()
 
     def hard_update(self):
@@ -57,3 +61,4 @@ class SequencerWidget(QtGui.QTableWidget):
         self.sequence[row].get_values(self.parent.arm)
         self.sequence[row].tie_values(self.parent.arm)
         self.parent.arm.calc_forward_kinematics()
+        self.update_values()

@@ -28,7 +28,10 @@ class SimWidget(QtOpenGL.QGLWidget):
         self.qglClearColor(self.colour.dark())
         glShadeModel(GL_FLAT)
         glEnable(GL_DEPTH_TEST)
-        glEnable(GL_CULL_FACE)
+        # glEnable(GL_CULL_FACE)
+        glLightfv(GL_LIGHT0, GL_POSITION, (0, 1000, 400, 1.0))
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
 
     def paintGL(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -96,6 +99,7 @@ class GraphicsPart(object):
 
         self.gl_list = glGenLists(1)
         glNewList(self.gl_list, GL_COMPILE)
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.2, 0.2, 1.0, 1.0))
         self.load_ascii_stl(file_object)
         glEndList()
 

@@ -23,13 +23,9 @@
 # syntax:
 >>> BEGIN CONTROLS
 Angle(self, [("origin", "shoulderR", "x"), ("origin", "shoulderL", "-x")], -180, 180, 0, "Shoulder")
-Angle(self, ("shoulderR", "shoulderRhorizontal"), -180, 180, 0, "Right Shoulder Horizontal")
-Angle(self, ("shoulderRhorizontal", "shoulderRvertical"), -180, 180, 0, "Right Shoulder Vertical")
-Angle(self, ("shoulderRvertical", "wristR"), -180, 180, 0, "Right Wrist")
-
-Angle(self, ("shoulderL", "shoulderLhorizontal"), -180, 180, 0, "Left Shoulder Horizontal")
-Angle(self, ("shoulderLhorizontal", "shoulderLvertical"), -180, 180, 0, "Left Shoulder Vertical")
-Angle(self, ("shoulderLvertical", "wristL"), -180, 180, 0, "Left Wrist")
+Angle(self, [("shoulderR", "shoulderRhorizontal", "x"), ("shoulderL", "shoulderLhorizontal", "x")], -180, 180, 0, "Right Shoulder Horizontal")
+Angle(self, [("shoulderRhorizontal", "shoulderRvertical", "x"), ("shoulderLhorizontal", "shoulderLvertical", "-x")], -180, 180, 0, "Right Shoulder Vertical")
+Angle(self, [("shoulderRvertical", "wristR", "x"), ("shoulderLvertical", "wristL", "-x")], -180, 180, 0, "Right Wrist")
 >>> END
 
 ### Define models
