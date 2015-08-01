@@ -8,14 +8,14 @@
 ### Define members
 # syntax: [name, length, mounting axis normal, x, y, z]
 >>> BEGIN MEMBERS
-["shoulderR",            181,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
-["shoulderRhorizontal",  180,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
-["shoulderRvertical",    500,  [-1, 0, 0], [1, 0, 0], [0, 0, 1], [0, 1, 0]]
+["shoulderR",            300,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
+["shoulderRhorizontal",  0,    [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
+["shoulderRvertical",    500,  [-1, 0, 0], [0, 0, -1], [-50, 5, 0], [5, 50, 0]]
 ["wristR",               200,  [-1, 1, 0], [0, 0, -1], [-1, -1, 0], [-1, 1, 0]]
 
-["shoulderL",            181,  [0, 0, -1], [0, 0, -1], [0, 1, 0],  [-1, 0, 0]]
-["shoulderLhorizontal",  180,  [0, 0, -1], [0, 0, -1], [0, 1, 0],  [-1, 0, 0]]
-["shoulderLvertical",    500,  [1, 0, 0],  [1, 0, 0], [0, 0, 1], [0, 1, 0]]
+["shoulderL",            300,  [0, 0, -1], [0, 0, -1], [0, 1, 0],  [-1, 0, 0]]
+["shoulderLhorizontal",  0,    [0, 0, -1], [0, 0, -1], [0, 1, 0],  [-1, 0, 0]]
+["shoulderLvertical",    500,  [1, 0, 0],  [0, 0, -1], [50, 5, 0], [-5, 50, 0]]
 ["wristL",               200,  [1, 1, 0],  [0, 0, -1], [1, -1, 0], [1, 1, 0]]
 >>> END
 
@@ -34,13 +34,11 @@ Angle(self, ("shoulderLvertical", "wristL"), -180, 180, 0, "Left Wrist")
 
 ### Define models
 >>> BEGIN MODELS
-["shoulderR", "centre_column.stl"]
-["shoulderRhorizontal", "arm_joint_horizontal.stl"]
+["shoulderR", "member1.stl"]
 ["shoulderRvertical", "arm.stl"]
 ["wristR", "member1.stl"]
 
-# ["shoulderL", "member1.stl"]
-["shoulderLhorizontal", "arm_joint_horizontal.stl"]
+["shoulderL", "member1.stl"]
 ["shoulderLvertical", "arm.stl"]
 ["wristL", "member1.stl"]
 >>> END
