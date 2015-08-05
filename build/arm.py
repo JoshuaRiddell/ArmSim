@@ -56,7 +56,7 @@ class Arm(object):
                 origin = origin + self.members[chain[index]].get_vector()
 
         self.parent.sim_widget.update_display(self.member_points)
-        # print(self.parent.sequencer_widget.sequence[0].joint_angles)
+        self.parent.sequencer_widget.update_values()
 
     def transform_members(self, chain):
         angle = self.joint_angles[tuple(chain[:2])]

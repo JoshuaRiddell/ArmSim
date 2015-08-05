@@ -1,5 +1,6 @@
 import seq_elements as sqe
 from PyQt4 import QtGui
+from threading import Thread
 
 
 class SequencerWidget(QtGui.QTableWidget):
@@ -43,7 +44,6 @@ class SequencerWidget(QtGui.QTableWidget):
 
         for i, element in enumerate(self.sequence):
             for j, header in enumerate(header_names):
-                print(i, j, element.get_table_value(header))
                 newitem = QtGui.QTableWidgetItem(element.get_table_value(header))
                 self.setItem(i, j, newitem)
 
@@ -62,3 +62,17 @@ class SequencerWidget(QtGui.QTableWidget):
         self.sequence[row].tie_values(self.parent.arm)
         self.parent.arm.calc_forward_kinematics()
         self.update_values()
+
+    def run(self):
+        execute_thread = ExecuteThread(self.sequence, self.parent.arm)
+        execute_thread.start()
+
+class ExecuteThread(Thread):
+    def __init__(self, sequence, arm):
+        super().__init__()
+        self.sequence = sequence
+        self.arm = arm
+
+    def run(self):
+        for element in self.sequence:
+            element.execute(self.arm)
