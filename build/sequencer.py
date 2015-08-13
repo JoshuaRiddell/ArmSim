@@ -10,6 +10,8 @@ class SequencerWidget(QtGui.QTableWidget):
         self.parent = parent
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.sequence = []
+        self.current_row = -1
+        self.running = False
 
         self.sequence = [
             sqe.NodeElement(1, self.parent.arm),
@@ -55,24 +57,40 @@ class SequencerWidget(QtGui.QTableWidget):
 
         self.update_values()
 
-    def cell_activated(self, row, col, prev_row, prev_col):
+    def cell_activated(self, row, col, prev_row=None, prev_col=None):
+        if self.running:
+            return
+        if prev_row is None or self.current_row == -1:
+            prev_row = self.current_row
         if prev_row != -1:
             self.sequence[prev_row].untie_values(self.parent.arm)
-        self.sequence[row].get_values(self.parent.arm)
-        self.sequence[row].tie_values(self.parent.arm)
-        self.parent.arm.calc_forward_kinematics()
+        if row != -1:
+            self.sequence[row].get_values(self.parent.arm)
+            self.sequence[row].tie_values(self.parent.arm)
+            self.parent.arm.calc_forward_kinematics()
         self.update_values()
+        self.current_row = row
 
     def run(self):
-        execute_thread = ExecuteThread(self.sequence, self.parent.arm)
+        if self.running:
+            return
+        self.cell_activated(-1, -1)
+        self.running = True
+        execute_thread = ExecuteThread(self, self.sequence, self.parent.arm)
         execute_thread.start()
 
 class ExecuteThread(Thread):
-    def __init__(self, sequence, arm):
+    def __init__(self, parent, sequence, arm):
         super().__init__()
+        self.parent = parent
         self.sequence = sequence
         self.arm = arm
 
     def run(self):
+        self.sequence[0].init_execute(self.arm)
+
         for element in self.sequence:
             element.execute(self.arm)
+
+        parent = self.parent
+        parent.running = False

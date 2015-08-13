@@ -23,8 +23,13 @@ class MainWindow(QtGui.QMainWindow):
                                                 CONFIG["def_arms_directory"])
         self.arm = arm.Arm(self)
         self.arm_data = None
-        self.sim_widget = simulator.SimWidget(CONFIG["cam_config"])
+        self.sim_widget = simulator.SimWidget(self, CONFIG["cam_config"])
         self.sequencer_widget = sequencer.SequencerWidget(self)
+
+        self.main_clock = QtCore.QTimer()
+        QtCore.QObject.connect(self.main_clock, QtCore.SIGNAL("timeout()"),
+            self.sim_widget.update_display)
+        self.main_clock.start(33)
 
         self.initMenus()
         self.initGui()
@@ -77,6 +82,7 @@ class MainWindow(QtGui.QMainWindow):
         run_button.clicked.connect(self.sequencer_widget.run)
         sequencer_layout.addWidget(QtGui.QLabel("Sequencer"), 0)
         sequencer_layout.addWidget(run_button, 0)
+        sequencer_layout.addWidget(add_button, 0)
         sequencer_layout.addWidget(self.sequencer_widget, 0)
         sequencer.setLayout(sequencer_layout)
         ### End Sequencer
@@ -138,3 +144,4 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     mainWin = MainWindow()
     sys.exit(app.exec_())
+

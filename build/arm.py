@@ -15,6 +15,7 @@ class Arm(object):
         """
         self.parent = parent
         self.joint_angles = {}
+        self.member_points = {}
 
     def load_arm(self, arm_dictionary):
         self.members = {}
@@ -33,7 +34,7 @@ class Arm(object):
         self.member_points = {ORIGIN_KEYWORD: (array([0, 0, 0]), None)}
         self.arm_chain = None
 
-    def calc_forward_kinematics(self):
+    def calc_forward_kinematics(self, update_seq=True):
         self.arm_chain = []
 
         for chain in self.chains:
@@ -55,8 +56,8 @@ class Arm(object):
 
                 origin = origin + self.members[chain[index]].get_vector()
 
-        self.parent.sim_widget.update_display(self.member_points)
-        self.parent.sequencer_widget.update_values()
+        if update_seq:
+            self.parent.sequencer_widget.update_values()
 
     def transform_members(self, chain):
         angle = self.joint_angles[tuple(chain[:2])]

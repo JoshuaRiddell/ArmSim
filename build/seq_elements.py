@@ -48,40 +48,46 @@ class NodeElement(_SequenceElement):
                 return str(self.joint_angles[key])
 
     def tie_values(self, arm):
+        print(self.queue_pos, "tied")
         self.joint_angles = arm.joint_angles
 
     def untie_values(self, arm):
+        print(self.queue_pos, "untied")
         self.joint_angles = arm.joint_angles.copy()
 
     def get_values(self, arm):
         arm.set_joint_angles(self.joint_angles.copy())
 
+    def init_execute(self, arm):
+        arm.set_joint_angles(self.joint_angles)
 
     def execute(self, arm):
         TIME = 3
 
         current = arm.joint_angles.copy()
         future = self.joint_angles.copy()
-        difference = {}
+
+        diff_dict = {}
         diff_list = []
         for key in current.keys():
-            new_val = current[key] - future[key]
-            difference[key] = new_val
+            new_val = future[key] - current[key]
+            diff_dict[key] = new_val
             diff_list.append(abs(new_val))
-        print(diff_list)
-        if max(diff_list) == 0:
-            return
-        interval = TIME / max(diff_list)
-        for key in difference.keys():
-            difference[key] = new_val / max(diff_list)
 
-        for i in range(max(diff_list)):
-            new_current = {}
-            for key in difference.keys():
-                new_current[key] = arm.joint_angles[key] + difference[key]
-            arm.set_joint_angles(new_current)
-            sleep(interval)
-        print(self.type, "executed")
+        if abs(max(diff_list)) < 1:
+            return
+
+        count = abs(round(max(diff_list)))
+        tim_interval = TIME / count
+
+        for key in diff_dict.keys():
+            diff_dict[key] = diff_dict[key] / count
+
+        for i in range(count):
+            for key in arm.joint_angles.keys():
+                arm.joint_angles[key] += diff_dict[key]
+            arm.calc_forward_kinematics(False)
+            sleep(tim_interval)
 
     def hard_update(self, arm):
         self.headers = ["Type"]
