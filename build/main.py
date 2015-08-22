@@ -80,6 +80,8 @@ class MainWindow(QtGui.QMainWindow):
         sequencer_layout = QtGui.QVBoxLayout()
         run_button = QtGui.QPushButton("Run")
         run_button.clicked.connect(self.sequencer_widget.run)
+        add_button = QtGui.QPushButton("Add")
+        add_button.clicked.connect(self.sequencer_widget.add_seq)
         sequencer_layout.addWidget(QtGui.QLabel("Sequencer"), 0)
         sequencer_layout.addWidget(run_button, 0)
         sequencer_layout.addWidget(add_button, 0)

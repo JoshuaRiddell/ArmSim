@@ -14,20 +14,17 @@ class SequencerWidget(QtGui.QTableWidget):
         self.running = False
 
         self.sequence = [
-            sqe.NodeElement(1, self.parent.arm),
-            sqe.NodeElement(2, self.parent.arm),
-            sqe.NodeElement(3, self.parent.arm),
-            sqe.NodeElement(4, self.parent.arm),
-            sqe.NodeElement(5, self.parent.arm),
-            sqe.NodeElement(6, self.parent.arm),
-            sqe.NodeElement(7, self.parent.arm),
-            sqe.NodeElement(8, self.parent.arm),
-            sqe.NodeElement(9, self.parent.arm),
-            sqe.NodeElement(10, self.parent.arm),
-            sqe.NodeElement(11, self.parent.arm)
+            sqe.NodeElement(0, self.parent.arm)
         ]
 
         self.update_values()
+
+    def add_seq(self):
+        new_element = sqe.NodeElement(len(self.sequence), self.parent.arm)
+        new_element.joint_angles = self.parent.arm.joint_angles.copy()
+        self.sequence.append(new_element)
+        self.update_values()
+        self.cell_activated(len(self.sequence)-1)
 
     def update_values(self):
         header_names = []
@@ -57,9 +54,11 @@ class SequencerWidget(QtGui.QTableWidget):
 
         self.update_values()
 
-    def cell_activated(self, row, col, prev_row=None, prev_col=None):
+    def cell_activated(self, row, col=None, prev_row=None, prev_col=None):
         if self.running:
             return
+        print("prev_row", prev_row)
+        print("current row", self.current_row)
         if prev_row is None or self.current_row == -1:
             prev_row = self.current_row
         if prev_row != -1:
@@ -72,6 +71,7 @@ class SequencerWidget(QtGui.QTableWidget):
         self.current_row = row
 
     def run(self):
+        # print("run", self.running)
         if self.running:
             return
         self.cell_activated(-1, -1)

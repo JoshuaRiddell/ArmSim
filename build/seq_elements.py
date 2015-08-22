@@ -50,12 +50,15 @@ class NodeElement(_SequenceElement):
     def tie_values(self, arm):
         print(self.queue_pos, "tied")
         self.joint_angles = arm.joint_angles
+        print(self.queue_pos, self.joint_angles)
 
     def untie_values(self, arm):
         print(self.queue_pos, "untied")
         self.joint_angles = arm.joint_angles.copy()
+        print(self.queue_pos, self.joint_angles)
 
     def get_values(self, arm):
+        print(self.queue_pos, self.joint_angles)
         arm.set_joint_angles(self.joint_angles.copy())
 
     def init_execute(self, arm):
@@ -77,7 +80,7 @@ class NodeElement(_SequenceElement):
         if abs(max(diff_list)) < 1:
             return
 
-        count = abs(round(max(diff_list)))
+        count = 100
         tim_interval = TIME / count
 
         for key in diff_dict.keys():
