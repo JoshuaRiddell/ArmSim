@@ -2,7 +2,7 @@ import file_io
 import arm
 import simulator
 import sequencer
-from controls import Angle
+import controls
 
 import sys
 
@@ -15,7 +15,11 @@ CONFIG = eval(file_io.load_config(CONFIG_FILE))
 
 
 class MainWindow(QtGui.QMainWindow):
+    """ Main top level class, contains instances of all other main classes"""
+
     def __init__(self):
+        """ Initialise all main classes.
+        """
         super(MainWindow, self).__init__()
 
         self.file_manager = file_io.FileManager(self,
@@ -24,11 +28,13 @@ class MainWindow(QtGui.QMainWindow):
         self.arm = arm.Arm(self)
         self.arm_data = None
         self.sim_widget = simulator.SimWidget(self, CONFIG["cam_config"])
+        self.controls_area = controls.ControlsArea(self)
         self.sequencer_widget = sequencer.SequencerWidget(self)
 
+        # update the simulator window every 33ms (~30fps)
         self.main_clock = QtCore.QTimer()
         QtCore.QObject.connect(self.main_clock, QtCore.SIGNAL("timeout()"),
-            self.sim_widget.update_display)
+                               self.sim_widget.update_display)
         self.main_clock.start(33)
 
         self.initMenus()
@@ -41,6 +47,8 @@ class MainWindow(QtGui.QMainWindow):
         self.showMaximized()
 
     def initMenus(self):
+        """ Initialise top bar menu items by importing from configuration file.
+        """
         menu_items = eval(file_io.load_config(MENU_FILE))
         menubar = self.menuBar()
 
@@ -57,24 +65,6 @@ class MainWindow(QtGui.QMainWindow):
                 newMenu.addAction(newAction)
 
     def initGui(self):
-        ### Begin Quick Buttons
-        quick_buttons = QtGui.QWidget()
-        quick_buttons_layout = QtGui.QHBoxLayout()
-        ### Begin Quick Buttons
-
-        ### Begin Controls
-        self.controls_area = QtGui.QScrollArea()
-        self.controls_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-
-        self.update_controls()
-
-        controls_ = QtGui.QWidget()
-        controls_layout = QtGui.QVBoxLayout()
-        controls_layout.addWidget(QtGui.QLabel("Controls"), 0)
-        controls_layout.addWidget(self.controls_area, 1)
-        controls_.setLayout(controls_layout)
-        ### End Controls
-
         ### Begin Sequencer
         sequencer = QtGui.QWidget()
         sequencer_layout = QtGui.QVBoxLayout()
@@ -91,7 +81,7 @@ class MainWindow(QtGui.QMainWindow):
 
         ### Begin Left Panel Layout
         panel_widget = QtGui.QSplitter(QtCore.Qt.Vertical)
-        panel_widget.addWidget(controls_)
+        panel_widget.addWidget(self.controls_area)
         panel_widget.addWidget(sequencer)
         ### End Left Panel Layout
 
@@ -99,51 +89,35 @@ class MainWindow(QtGui.QMainWindow):
         main_container = QtGui.QSplitter(QtCore.Qt.Horizontal)
         main_container.addWidget(panel_widget)
         main_container.addWidget(self.sim_widget)
-        main_container.splitterMoved.connect(self.splitter_update)
+        # main_container.splitterMoved.connect(self.splitter_update)
 
         self.setCentralWidget(main_container)
         ### End Overall Layout
 
-        self.resizeEvent()
+        # self.resizeEvent()
 
-    def update_controls(self):
-        self.controls = []
-        self.controls_widget = QtGui.QWidget(self.controls_area)
-        controls_widget_layout = QtGui.QVBoxLayout()
-
-        if self.arm_data is not None:
-            for i, control in enumerate(self.arm_data["CONTROLS"]):
-                new_control = eval(control)
-                controls_widget_layout.addWidget(eval(control))
-                self.controls.append(new_control)
-
-        self.controls_widget.setLayout(controls_widget_layout)
-        self.controls_area.setWidget(self.controls_widget)
-        self.splitter_update()
-
-    def update_control_values(self):
-        for control in self.controls:
-            control.pull_values()
+    # def update_control_values(self):
+    #     for control in self.controls_area:
+    #         control.pull_values()
 
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
         self.sim_widget.load_arm(arm_data, self.file_manager)
         self.arm_data = arm_data
-        self.update_controls()
+        self.controls_area.update_controls(arm_data)
         self.sequencer_widget.hard_update()
 
     def update_arm_pos(self, arm_func, *args):
         getattr(self.arm, arm_func)(*args)
 
-    def splitter_update(self, index=None, stretch=None):
-        self.controls_widget.setFixedWidth(self.controls_area.frameRect().width())
+    # def splitter_update(self, index=None, stretch=None):
+    #     self.controls_area_widget.setFixedWidth(self.controls_area_area.frameRect().width())
 
-    def resizeEvent(self, event=None):
-        self.splitter_update()
+    # def resizeEvent(self, event=None):
+    #     self.splitter_update()
 
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     mainWin = MainWindow()
     sys.exit(app.exec_())
-

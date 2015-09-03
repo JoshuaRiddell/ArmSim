@@ -1,6 +1,41 @@
 from PyQt4 import QtGui, QtCore
 
 
+class ControlsArea(QtGui.QWidget):
+    def __init__(self, parent):
+        super().__init__()
+
+        self.parent = parent
+        self.arm = parent.arm
+
+        self.scroll_area = QtGui.QScrollArea()
+        self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+        self.update_controls()
+
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(QtGui.QLabel("Controls"), 0)
+        layout.addWidget(self.scroll_area, 1)
+        self.setLayout(layout)
+
+    def update_controls(self, arm_data=None):
+        self.controls = []
+        self.controls_widget = QtGui.QWidget()
+        controls_widget_layout = QtGui.QVBoxLayout()
+
+        if arm_data is not None:
+            for i, control in enumerate(arm_data["CONTROLS"]):
+                new_control = eval(control)
+                controls_widget_layout.addWidget(eval(control))
+                self.controls.append(new_control)
+
+        self.scroll_area.setLayout(controls_widget_layout)
+        # self.splitter_update()
+
+    def resizeEvent(self):
+        print("ran")
+
+
 class Angle(QtGui.QWidget):
     def __init__(self, parent, joints, minimum, maximum, default, name=None):
         super().__init__()
