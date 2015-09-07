@@ -20,7 +20,7 @@ class ControlsArea(QtGui.QWidget):
 
     def update_controls(self, arm_data=None):
         self.controls = []
-        self.controls_widget = QtGui.QWidget()
+        self.controls_widget = QtGui.QWidget(self.scroll_area)
         controls_widget_layout = QtGui.QVBoxLayout()
 
         if arm_data is not None:
@@ -29,11 +29,12 @@ class ControlsArea(QtGui.QWidget):
                 controls_widget_layout.addWidget(eval(control))
                 self.controls.append(new_control)
 
-        self.scroll_area.setLayout(controls_widget_layout)
-        # self.splitter_update()
+        self.controls_widget.setLayout(controls_widget_layout)
+        self.scroll_area.setWidget(self.controls_widget)
+        self.splitter_update()
 
-    def resizeEvent(self):
-        print("ran")
+    def splitter_update(self):
+        self.controls_widget.setFixedWidth(self.scroll_area.frameRect().width())
 
 
 class Angle(QtGui.QWidget):

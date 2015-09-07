@@ -89,16 +89,10 @@ class MainWindow(QtGui.QMainWindow):
         main_container = QtGui.QSplitter(QtCore.Qt.Horizontal)
         main_container.addWidget(panel_widget)
         main_container.addWidget(self.sim_widget)
-        # main_container.splitterMoved.connect(self.splitter_update)
+        main_container.splitterMoved.connect(self.controls_area.splitter_update)
 
         self.setCentralWidget(main_container)
         ### End Overall Layout
-
-        # self.resizeEvent()
-
-    # def update_control_values(self):
-    #     for control in self.controls_area:
-    #         control.pull_values()
 
     def load_arm(self, arm_data):
         self.arm.load_arm(arm_data)
@@ -110,11 +104,8 @@ class MainWindow(QtGui.QMainWindow):
     def update_arm_pos(self, arm_func, *args):
         getattr(self.arm, arm_func)(*args)
 
-    # def splitter_update(self, index=None, stretch=None):
-    #     self.controls_area_widget.setFixedWidth(self.controls_area_area.frameRect().width())
-
-    # def resizeEvent(self, event=None):
-    #     self.splitter_update()
+    def resizeEvent(self, event=None):
+        self.controls_area.splitter_update()
 
 
 if __name__ == '__main__':
