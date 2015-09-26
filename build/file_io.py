@@ -64,6 +64,8 @@ class FileManager(object):
                 else:
                     current_field = ""
                 continue
+            ### Change method below, not as robust as it could be (will fail if
+            ### the classes are mistyped)
             try:
                 arm_dictionary[current_field].append(eval(line))
             except NameError:
@@ -72,6 +74,7 @@ class FileManager(object):
         self.arm_data = arm_dictionary
         self._update_directories()
         self.parent.load_arm(self.arm_data)
+        ### Commented to let the full error message propogate into IDE
         # except Exception as error:
         #     QtGui.QMessageBox.warning(
         #         self.parent, "Invalid Arm File",

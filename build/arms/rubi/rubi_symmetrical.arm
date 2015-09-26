@@ -7,7 +7,7 @@
 
 ### Define members
 # syntax: [name, length, mounting axis normal, x, y, z]
->>> BEGIN MEMBERS
+>>> BEGIN MEMBERS hello
 ["shoulderR",            181,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
 ["shoulderRhorizontal",  180,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
 ["shoulderRvertical",    430,  [-1, 0, 0], [1, 0, 0],  [0, 0, 1], [0, 1, 0]]

@@ -7,8 +7,8 @@
 ### Define members
 # syntax: [name, length, mounting axis normal, x, y, z]
 >>> BEGIN MEMBERS
-["member1", 200, [0, -1, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]
-["member2", 100, [0, -1, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]
+["member1", 200, [0, -1, 0], [1, 0, 0], None, [0, 0, 1]]
+["member2", 100, [0, -1, 0], [1, 0, 0], None, [0, 0, 1]]
 >>> END
 
 ### Define controls

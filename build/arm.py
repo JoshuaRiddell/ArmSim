@@ -100,7 +100,8 @@ class Member(object):
     def __init__(self, length, axis_normal, x, y, z):
         self.length = length
         self.axes = []
-        for vector in [x, y, z]:
+        axes = self.validate_axes([x, y, z])
+        for vector in axes:
             self.axes.append(append(tf.unit_vector(array(vector)), [1]))
         self.axis_normal = append(tf.unit_vector(array(axis_normal)), [1])
 
@@ -127,6 +128,23 @@ class Member(object):
     def reset(self):
         self.axis_normal = self.backup[0][:]
         self.axes = self.backup[1][:]
+
+    def validate_axes(self, axes):
+        print(axes)
+        # detemine index to subtract first
+        try:
+            i = axes.index(None)
+        except:
+            i = 1  # by default give the first and third axes priority
+
+        # TODO: add, if two None types are defined then just generate generic
+        #       axes
+
+        axes.pop(i)
+        axes.insert(i, cross(*axes)) # replace missing axis with cross
+        axes[1-i] = cross(axes[2], axes[i])
+        print(axes)
+        return axes
 
     def __repr__(self):
         return "Member object; direction:" + repr(around(self.vectors[1], 1))
