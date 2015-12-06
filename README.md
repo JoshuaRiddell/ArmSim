@@ -15,7 +15,7 @@ This was originally created for Assignment 3 of CSSE1001 at UQ in semester 1, 20
 
 #### Installation
 
-1. Install all external resources see [Dependencies](https://github.com/JoshuaRiddell/ArmSim/blob/pyglet-legacy/README.md#dependencies).
+1. Install all external resources see [Dependencies](https://github.com/JoshuaRiddell/ArmSim#dependencies).
 
 2. Execute ./build/main.py in Python3.
 
