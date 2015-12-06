@@ -27,9 +27,9 @@ class MainWindow(QtGui.QMainWindow):
                                                 CONFIG["def_arms_directory"])
         self.arm = arm.Arm(self)
         self.arm_data = None
-        self.sim_widget = simulator.SimWidget(self, CONFIG["cam_config"])
+        self.sim_widget = simulator.SimWidget(self, self.arm, CONFIG["cam_config"])
         self.controls_area = controls.ControlsArea(self)
-        self.sequencer_widget = sequencer.SequencerWidget(self)
+        self.sequencer_widget = sequencer.SequencerWidget(self, self.arm)
 
         # update the simulator window every 33ms (~30fps)
         self.main_clock = QtCore.QTimer()

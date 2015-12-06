@@ -87,7 +87,7 @@ class Arm(object):
 
     def set_joint_angles(self, joint_angles):
         self.joint_angles = joint_angles
-        self.parent.update_control_values()
+        # self.parent.update_control_values()  # update the control values, not yet implemented
 
     def get_joint_names(self):
         joint_name_list = []

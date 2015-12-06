@@ -13,10 +13,12 @@ gl_identity = [[1, 0, 0, 0],
                [0, 0, 1, 0],
                [0, 0, 0, 1]]
 
+
 class SimWidget(QtOpenGL.QGLWidget):
-    def __init__(self, parent, cam_config):
+    def __init__(self, parent, arm, cam_config):
         super().__init__()
         self.parent = parent
+        self.arm = arm
         self.cam_config = cam_config
         self.camera = Camera(cam_config)
         self.object = None
@@ -52,7 +54,7 @@ class SimWidget(QtOpenGL.QGLWidget):
                        self.cam_config["far_limit"])
 
     def update_display(self):
-        arm_vectors = self.parent.arm.member_points
+        arm_vectors = self.arm.member_points
         for graphics_part in self.graphics_parts:
             matrix = arm_vectors.get(graphics_part.name)
             if matrix is None:

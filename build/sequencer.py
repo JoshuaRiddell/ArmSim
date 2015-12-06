@@ -4,24 +4,25 @@ from threading import Thread
 
 
 class SequencerWidget(QtGui.QTableWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, arm):
         super().__init__()
         self.currentCellChanged.connect(self.cell_activated)
         self.parent = parent
+        self.arm = arm
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.sequence = []
         self.current_row = -1
         self.running = False
 
         self.sequence = [
-            sqe.NodeElement(0, self.parent.arm)
+            sqe.NodeElement(0, self.arm)
         ]
 
         self.update_values()
 
     def add_seq(self):
-        new_element = sqe.NodeElement(len(self.sequence), self.parent.arm)
-        new_element.joint_angles = self.parent.arm.joint_angles.copy()
+        new_element = sqe.NodeElement(len(self.sequence), self.arm)
+        new_element.joint_angles = self.arm.joint_angles.copy()
         self.sequence.append(new_element)
         self.update_values()
         self.cell_activated(len(self.sequence)-1)
@@ -50,7 +51,7 @@ class SequencerWidget(QtGui.QTableWidget):
 
     def hard_update(self):
         for element in self.sequence:
-            element.hard_update(self.parent.arm)
+            element.hard_update(self.arm)
 
         self.update_values()
 
@@ -62,11 +63,11 @@ class SequencerWidget(QtGui.QTableWidget):
         if prev_row is None or self.current_row == -1:
             prev_row = self.current_row
         if prev_row != -1:
-            self.sequence[prev_row].untie_values(self.parent.arm)
+            self.sequence[prev_row].untie_values(self.arm)
         if row != -1:
-            self.sequence[row].get_values(self.parent.arm)
-            self.sequence[row].tie_values(self.parent.arm)
-            self.parent.arm.calc_forward_kinematics()
+            self.sequence[row].get_values(self.arm)
+            self.sequence[row].tie_values(self.arm)
+            self.arm.calc_forward_kinematics()
         self.update_values()
         self.current_row = row
 
@@ -76,7 +77,7 @@ class SequencerWidget(QtGui.QTableWidget):
             return
         self.cell_activated(-1, -1)
         self.running = True
-        execute_thread = ExecuteThread(self, self.sequence, self.parent.arm)
+        execute_thread = ExecuteThread(self, self.sequence, self.arm)
         execute_thread.start()
 
 class ExecuteThread(Thread):
