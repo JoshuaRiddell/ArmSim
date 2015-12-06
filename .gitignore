@@ -1,0 +1,4 @@
+build/LEGACY/*
+*.pyc
+*.sublime-project
+ArmSim.sublime-workspace

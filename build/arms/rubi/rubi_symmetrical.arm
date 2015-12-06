@@ -1,0 +1,42 @@
+### Define vector chains
+# syntax: [member1, member2, member3, ..., membern]
+>>> BEGIN VECTOR_CHAINS
+["origin", "shoulderR", "shoulderRhorizontal", "shoulderRvertical", "wristR"]
+["origin", "shoulderL", "shoulderLhorizontal", "shoulderLvertical", "wristL"]
+>>> END
+
+### Define members
+# syntax: [name, length, mounting axis normal, x, y, z]
+>>> BEGIN MEMBERS
+["shoulderR",            181,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
+["shoulderRhorizontal",  180,  [0, 0, 1],  [0, 0, -1], [0, 1, 0],   [1, 0, 0]]
+["shoulderRvertical",    430,  [-1, 0, 0], [1, 0, 0],  [0, 0, 1], [0, 1, 0]]
+["wristR",               200,  [0, 3, 1],  [0, -1, 3],  [1, 0, 0], [0, 3, 1]]
+
+["shoulderL",            181,  [0, 0, -1], [0, 0, -1], [0, 1, 0],  [-1, 0, 0]]
+["shoulderLhorizontal",  180,  [0, 0, -1], [0, 0, -1], [0, 1, 0],  [-1, 0, 0]]
+["shoulderLvertical",    430,  [1, 0, 0],  [1, 0, 0],  [0, 0, 1], [0, 1, 0]]
+["wristL",               200,  [0, 3, 1],  [0, -1, 3],  [1, 0, 0], [0, 3, 1]]
+>>> END
+
+### Define controls
+# syntax:
+>>> BEGIN CONTROLS
+Angle(self, [("origin", "shoulderR", "x"), ("origin", "shoulderL", "-x")], -180, 180, 0, "Torso")
+Angle(self, [("shoulderR", "shoulderRhorizontal", "x"), ("shoulderL", "shoulderLhorizontal", "x")], -180, 180, 0, "Shoulder Horizontal")
+Angle(self, [("shoulderRhorizontal", "shoulderRvertical", "x"), ("shoulderLhorizontal", "shoulderLvertical", "-x")], -180, 180, 0, "Shoulder Vertical")
+Angle(self, [("shoulderRvertical", "wristR", "x"), ("shoulderLvertical", "wristL", "x")], -180, 180, 0, "Wrist")
+>>> END
+
+### Define models
+>>> BEGIN MODELS
+["shoulderR", "centre_column.stl"]
+["shoulderRhorizontal", "arm_joint_horizontal.stl"]
+["shoulderRvertical", "arm.stl"]
+["wristR", "member1.stl"]
+
+# ["shoulderL", "member1.stl"]
+["shoulderLhorizontal", "arm_joint_horizontal.stl"]
+["shoulderLvertical", "arm.stl"]
+["wristL", "member1.stl"]
+>>> END

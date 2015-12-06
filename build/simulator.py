@@ -1,118 +1,206 @@
-#   ArmSim                                                             #
-#   By: Joshua Riddell                                                 #
-#                                                                      #
-#  Permission is hereby granted, free of charge, to any person         #
-#  obtaining a copy of this software and associated documentation      #
-#  files (the "Software"), to deal in the Software without             #
-#  restriction, including without limitation the rights to use,        #
-#  copy, modify, merge, publish, distribute, sublicense, and/or sell   #
-#  copies of the Software, and to permit persons to whom the           #
-#  Software is furnished to do so.                                     #
-#                                                                      #
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,     #
-#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES     #
-#  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND            #
-#  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR        #
-#  ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      #
-#  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  #
-#  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.     #
+import sys
 
-import pyglet
-from file_io import load_config_file
-from pyglet.gl import *
-import graphics
+from numpy import array, dot, cross
+from numpy.linalg import norm
+from math import atan2, pi, cos, sin
+import transformations as tf
+from PyQt4 import QtCore, QtGui, QtOpenGL
+from OpenGL.GL import *
+from OpenGL.GLU import *
 
-SIM_SETTINGS = load_config_file('simulator')
+gl_identity = [[1, 0, 0, 0],
+               [0, 1, 0, 0],
+               [0, 0, 1, 0],
+               [0, 0, 0, 1]]
 
 
-class SimulationWindow(pyglet.window.Window):
-    def __init__(self, settings, joints):
+class SimWidget(QtOpenGL.QGLWidget):
+    def __init__(self, parent, arm, cam_config):
+        super().__init__()
+        self.parent = parent
+        self.arm = arm
+        self.cam_config = cam_config
+        self.camera = Camera(cam_config)
+        self.object = None
+        self.colour = QtGui.QColor.fromCmykF(0, 0, 0, 0.0)
+        self.graphics_parts = []
+        self.arm_vectors = None
+        self.last_mouse_pos = None
 
-        ### Create instance of the window ###
-        user_settings = graphics.load_config_file('graphics')
-        self.view_settings = graphics.load_config_file('view')
+    def initializeGL(self):
+        self.qglClearColor(self.colour.dark())
+        glShadeModel(GL_FLAT)
+        glEnable(GL_DEPTH_TEST)
+        # glEnable(GL_CULL_FACE)
+        glLightfv(GL_LIGHT0, GL_POSITION, (0, 1000, 400, 1.0))
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
 
-        try:
-            # Try with multisampling (antialiasing)
-            if SIM_SETTINGS["force_no_multisampling"]:
-                raise pyglet.window.NoSuchConfigException
-            config = Config(sample_buffer=user_settings["sample_buffer"],
-                            samples=user_settings["samples"],
-                            depth_size=user_settings["depth_size"],
-                            double_buffer=user_settings["double_buffer"])
-            super().__init__(*settings[:2],
-                             resizable=True,
-                             caption="ArmSim - Simulator",
-                             config=config)
-        except pyglet.window.NoSuchConfigException:
-            # No multisampling if not possible on current hardware
-            super().__init__(*settings[:2],
-                             caption="ArmSim - Simulator",
-                             resizable=True)
-        self.set_location(*settings[2:])
-        self.set_minimum_size(320, 320)
-
-        ### Initialise resources for displaying graphics ###
-        self.cam = graphics.Camera([235, -227, 311],
-                                   [-9, 58, 83],
-                                   [-0.3379, 0.3931, 0.8551])
-
-        ordered_names = ['base',
-                         'joint1',
-                         'joint2',
-                         'joint3',
-                         'joint4',
-                         'joint5',
-                         'joint6']
-        self.parts = []
-        for part_name in ordered_names:
-            self.parts.append(graphics.GraphicsPart(part_name))
-
-        self.activated = True
-        self.update_joints(joints)
-        graphics.initialise()
-
-    def on_resize(self, width, height):
-        """ Is called when the window is resized. Ensures viewport and projection
-        are set correctly for the current window size.
-
-        on_resize(int, int) -> None
-        """
-        user_settings = self.view_settings
-        glViewport(0, 0, width, height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(user_settings['fov'], width / float(height),
-                       user_settings['near_limit'], user_settings['far_limit'])
-        glMatrixMode(GL_MODELVIEW)
-        return pyglet.event.EVENT_HANDLED
-
-    def on_draw(self, event=None):
-        """ Draws the parts in the simulation window.
-
-        on_draw(list(GraphicsPart), Camera) -> None
-        """
-        self.clear()
+    def paintGL(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        for graphics_part in self.parts:
-            graphics_part.draw(self.cam.get_cam())
+        glMatrixMode(GL_MODELVIEW)
+        for graphics_part in self.graphics_parts:
+            glLoadIdentity()
+            gluLookAt(*self.camera.get_cam())
+            graphics_part.draw()
 
-    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        """ Called when the mouse wheel is scrolled over the window.
+    def resizeGL(self, width, height):
+        glMatrixMode(GL_PROJECTION)
+        glViewport(0, 0, width, height)
+        glLoadIdentity()
+        gluPerspective(self.cam_config["fov"],
+                       width / float(height),
+                       self.cam_config["near_limit"],
+                       self.cam_config["far_limit"])
+
+    def update_display(self):
+        arm_vectors = self.arm.member_points
+        for graphics_part in self.graphics_parts:
+            matrix = arm_vectors.get(graphics_part.name)
+            if matrix is None:
+                continue
+            graphics_part.set_transformation(matrix)
+        self.updateGL()
+
+    def mousePressEvent(self, event):
+        self.last_mouse_pos = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.last_mouse_pos is None:
+            self.last_mouse_pos = event.pos()
+
+        dx = event.x() - self.last_mouse_pos.x()
+        dy = -(event.y() - self.last_mouse_pos.y())
+
+        self.last_mouse_pos = event.pos()
+
+        if event.buttons() & QtCore.Qt.LeftButton:
+            self.camera.user_orbit(dx, dy)
+        elif event.buttons() & QtCore.Qt.RightButton:
+            self.camera.user_pan(dx, dy)
+
+        self.updateGL()
+
+    def wheelEvent(self, event):
+        self.camera.user_zoom(event.delta())
+
+    def load_arm(self, arm_data, file_manager):
+        self.graphics_parts = []
+
+        for i, model_desc in enumerate(arm_data["MODELS"]):
+            fd = open(file_manager.get_model_file(model_desc[1]), 'rU')
+            self.graphics_parts.append(GraphicsPart(model_desc[0], fd))
+            fd.close()
+
+        self.updateGL()
+
+
+class GraphicsPart(object):
+
+    def __init__(self, name, file_object):
+        self.name = name
+        self.transformation = gl_identity
+
+        self.gl_list = glGenLists(1)
+        glNewList(self.gl_list, GL_COMPILE)
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.2, 0.2, 1.0, 1.0))
+        self.load_ascii_stl(file_object)
+        glEndList()
+
+    def set_transformation(self, transformation_matrix):
+        self.transformation = transformation_matrix
+
+    def draw(self):
+        glMultMatrixf(self.transformation)
+        glCallList(self.gl_list)
+
+    def load_ascii_stl(self, file_object):
+        glBegin(GL_TRIANGLES)
+        for line in file_object:
+            line = line.strip().split()
+            if line[0] == "solid":
+                pass
+            elif line[0] == "facet":
+                glNormal3f(*[float(x) for x in line[2:5]])
+            elif line[0] == "vertex":
+                glVertex3f(*[float(x) for x in line[1:4]])
+        glEnd()
+
+
+class Camera(object):
+    """ Class which handles the camera """
+
+    def __init__(self, cam_config):
+        self._settings = cam_config
+        self._position = array(cam_config["def_pos"])
+        self._focus = array(cam_config["def_focus"])
+        self._up = array(cam_config["def_up"])
+
+    def user_pan(self, dx, dy):
+        """ Pans the camera based on passed mouse movements.
+
+        user_pan(int, int) -> None
         """
-        self.cam.user_zoom(scroll_y)
+        sensetivity = self._settings["pan_sensetivity"]
+        focus_to_cam = self._position - self._focus
+        x = [self._position, self._focus]
+        for i in range(len(x)):
+            x[i] = x[i] + (-sensetivity*dy * tf.unit_vector(self._up))
+            x[i] = x[i] + (sensetivity*dx * tf.unit_vector(
+                cross(focus_to_cam, self._up)))
+        self._position, self._focus = x
 
-    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        if modifiers == SIM_SETTINGS["shift"]:
-            self.cam.user_pan(dx, dy)
-        else:
-            self.cam.user_orbit(dx, dy)
+    def user_orbit(self, dx, dy):
+        """ Orbits the camera based on passed mouse movements.
 
-    def update_joints(self, joints):
-        for joint in joints:
-            i = joints.index(joint)
-            self.parts[i].update_pos(*joint)
+        user_pan(int, int) -> None
 
-    def set_visible(self, visible):
-        super().set_visible(visible)
-        self.on_resize(self.width, self.height)
+        Note: h denotes horizontal and v denotes vertical
+        """
+        sensetivity = self._settings["orbit_sensetivity"]
+        focus_to_cam = self._position - self._focus
+
+        dist_to_focus_h = norm(focus_to_cam[:2])
+        dist_to_focus = norm(focus_to_cam)
+
+        angleh = atan2(focus_to_cam[1], focus_to_cam[0])
+        anglev = atan2(focus_to_cam[2], dist_to_focus_h)
+
+        angleh -= sensetivity*dx
+        anglev -= sensetivity*dy
+
+        if anglev >= pi/2-0.1:
+            anglev = pi/2-0.1
+        if anglev <= -pi/2+0.1:
+            anglev = -pi/2+0.1
+
+        focus_to_cam = array(
+            [cos(angleh)*cos(anglev)*dist_to_focus,
+            sin(angleh)*cos(anglev)*dist_to_focus,
+            sin(anglev)*dist_to_focus]
+        )
+
+        self._up = tf.unit_vector(-1 * cross(focus_to_cam,
+                            cross(focus_to_cam, array([0, 0, 1]))))
+        self._position = self._focus + focus_to_cam
+
+    def user_zoom(self, scroll_y):
+        """ Zooms the camera based on passed mouse movements.
+
+        user_zoom(int) -> None
+        """
+        sensetivity = self._settings["zoom_sensetivity"]
+        u_focus_to_cam = tf.unit_vector(self._position - self._focus)
+        self._position = self._position + \
+                         scroll_y*sensetivity * u_focus_to_cam
+        if norm(self._position - self._focus) <= 1:
+            self._focus = self._position + -1 * u_focus_to_cam
+        return None
+
+    def get_cam(self):
+        """ Returns a list of values in the format required for many OpenGL
+        functions.
+
+        get_cam() -> list[9](float)
+        """
+        return list(self._position) + list(self._focus) + list(self._up)

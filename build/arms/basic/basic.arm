@@ -1,0 +1,25 @@
+### Define vector chains
+# syntax: [member_1, member_2, member_3, ..., member_n]
+>>> BEGIN VECTOR_CHAINS
+["origin", "member1", "member2"]
+>>> END
+
+### Define members
+# syntax: [name, length, mounting axis normal, x, y, z]
+>>> BEGIN MEMBERS
+["member1", 200, [0, -1, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]
+["member2", 100, [0, -1, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]
+>>> END
+
+### Define controls
+# syntax: not yet implemented
+>>> BEGIN CONTROLS
+Angle(self, ("origin", "member1"), -180, 180, 0, "Base")
+Angle(self, ("member1", "member2"), -180, 180, 0, "Joint1")
+>>> END
+
+### Define models
+>>> BEGIN MODELS
+["member1", "member1.stl"]
+["member2", "member2.stl"]
+>>> END
