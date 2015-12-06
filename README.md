@@ -14,7 +14,7 @@ http://www.thingiverse.com/thing:30163.
 
 #### Installation
 
-1. Install all external resources see [Dependencies](https://github.com/JoshuaRiddell/ArnSim/blob/pyglet-legacy/README.md#Dependencies).
+1. Install all external resources see [Dependencies](https://github.com/JoshuaRiddell/ArmSim/blob/pyglet-legacy/README.md#dependencies).
 
 2. Execute ./build/main.py in Python3.
 
