@@ -22,3 +22,4 @@ This was originally created for Assignment 3 of CSSE1001 at UQ in semester 1, 20
 ### Dependencies
 
 * [PyQt4](http://pyqt.sourceforge.net/Docs/PyQt4/): pip install PyQt4
+* [Numpy](http://www.numpy.org): pip install numpy
