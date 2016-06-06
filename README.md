@@ -11,6 +11,8 @@ not supported.
 
 This was originally created for Assignment 3 of CSSE1001 at UQ in semester 1, 2015.
 
+The master branch is currently partially functional - to see the state of the assignment as it was handed in please see the ['pyglet-legacy'](https://github.com/JoshuaRiddell/ArmSim/tree/pyglet-legacy) branch.
+
 ### Main Application
 
 #### Installation
